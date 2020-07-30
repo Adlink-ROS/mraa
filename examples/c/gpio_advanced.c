@@ -17,7 +17,7 @@
 /* mraa header */
 #include "mraa/gpio.h"
 
-#define GPIO_PIN 34
+#define GPIO_PIN 6
 
 void
 int_handler(void* args)
@@ -44,15 +44,13 @@ main()
     }
 
     /* set GPIO to input */
-
-    status = mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
-    status = mraa_gpio_write(gpio, 0);
+    status = mraa_gpio_dir(gpio, MRAA_GPIO_IN);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
 
     /* configure ISR for GPIO */
-    //status = mraa_gpio_isr(gpio, MRAA_GPIO_EDGE_BOTH, &int_handler, NULL);
+    status = mraa_gpio_isr(gpio, MRAA_GPIO_EDGE_BOTH, &int_handler, NULL);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
@@ -77,3 +75,4 @@ err_exit:
 
     return EXIT_FAILURE;
 }
+
