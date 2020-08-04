@@ -160,11 +160,11 @@ mraa_board_t* mraa_roscube_i()
     mraa_roscube_set_pininfo(b, 10, "CON_PORT0_CAN-L",   (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 11, "CON_PORT1_CAN-L",   (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 12, "CON_I2C0_SDA",      (mraa_pincapabilities_t){  1, 0, 0, 0, 0, 1, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 13, "CON_I2C0_SLC",      (mraa_pincapabilities_t){  1, 0, 0, 0, 0, 1, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 13, "CON_I2C0_SCL",      (mraa_pincapabilities_t){  1, 0, 0, 0, 0, 1, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 14, "P_+5V_S_CN",        (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 15, "P_+3V3_S_CN",       (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 16, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 17, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 16, "CON_I2C1_SDA",      (mraa_pincapabilities_t){  1, 0, 0, 0, 0, 1, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 17, "CON_I2C1_SCL",      (mraa_pincapabilities_t){  1, 0, 0, 0, 0, 1, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 18, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 19, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 20, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
@@ -205,8 +205,7 @@ mraa_board_t* mraa_roscube_i()
     for (int i = 0; i < MRAA_ROSCUBE_UARTCOUNT; i++)
         mraa_roscube_init_uart(b, i);
     b->def_uart_dev = 0;
-
-#if 0 // TODO: SPI
+    #if 0
     // Configure SPI #0 CS1
     b->spi_bus_count = 0;
     b->spi_bus[b->spi_bus_count].bus_id = 1;
@@ -224,36 +223,30 @@ mraa_board_t* mraa_roscube_i()
     mraa_roscube_get_pin_index(b, "SPI_0_MISO", &(b->spi_bus[b->spi_bus_count].miso));
     mraa_roscube_get_pin_index(b, "SPI_0_SCLK",  &(b->spi_bus[b->spi_bus_count].sclk));
     b->spi_bus_count++;
-
+    #endif
     // Set number of i2c adaptors usable from userspace
     b->i2c_bus_count = 0;
     b->def_i2c_bus = 0;
 
-    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.1", "i2c_designware.1");
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:15.0","i2c_designware.0");
+    printf("0: %d",i2c_bus_num);
     if (i2c_bus_num != -1) {
-        if(sx150x_init(i2c_bus_num) < 0)
-        {
-            _fd = -1;
-        }
-
         b->i2c_bus[0].bus_id = i2c_bus_num;
-        mraa_roscube_get_pin_index(b, "I2C1_DAT", (int*) &(b->i2c_bus[1].sda));
-        mraa_roscube_get_pin_index(b, "I2C1_CK", (int*) &(b->i2c_bus[1].scl));
+        mraa_roscube_get_pin_index(b, "CON_I2C0_SDA", (int*) &(b->i2c_bus[0].sda));
+        mraa_roscube_get_pin_index(b, "CON_I2C0_SCL", (int*) &(b->i2c_bus[0].scl));
         b->i2c_bus_count++;
     }
 
-    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:1f.1", ".");
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:15.1","i2c_designware.1");
+    printf("1: %d",i2c_bus_num);
     if (i2c_bus_num != -1) {
         b->i2c_bus[1].bus_id = i2c_bus_num;
-        mraa_roscube_get_pin_index(b, "I2C0_DAT", (int*) &(b->i2c_bus[0].sda));
-        mraa_roscube_get_pin_index(b, "I2C0_CK", (int*) &(b->i2c_bus[0].scl));
+        mraa_roscube_get_pin_index(b, "CON_I2C1_SDA", (int*) &(b->i2c_bus[1].sda));
+        mraa_roscube_get_pin_index(b, "CON_I2C1_SDA", (int*) &(b->i2c_bus[1].scl));
         b->i2c_bus_count++;
     }
 
-    const char* pinctrl_path = "/sys/bus/platform/drivers/broxton-pinctrl";
-    int have_pinctrl = access(pinctrl_path, F_OK) != -1;
-    syslog(LOG_NOTICE, "ROSCUBE I: kernel pinctrl driver %savailable", have_pinctrl ? "" : "un");
-#endif
+
 
     return b;
 
