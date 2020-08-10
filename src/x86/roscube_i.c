@@ -35,14 +35,14 @@
 #include "gpio.h"
 #include "x86/roscube_i.h"
 #include "gpio/gpio_chardev.h"
+#include "mraa/gpio.h"
 
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
-
-
 #define PLATFORM_NAME "ROSCUBE-I"
 
 #define MRAA_ROSCUBE_GPIOCOUNT 16
 #define MRAA_ROSCUBE_UARTCOUNT 2
+#define MRAA_ROSCUBE_LEDCOUNT 6
 
 #define MAX_SIZE 64
 #define POLL_TIMEOUT
@@ -50,6 +50,7 @@
 static volatile int base1, base2, _fd;
 #define base1  220
 #define base2 253
+#define led_base 276
 static mraa_gpio_context gpio;
 static char* uart_name[MRAA_ROSCUBE_UARTCOUNT] = {"COM1", "COM2"};
 static char* uart_path[MRAA_ROSCUBE_UARTCOUNT] = {"/dev/ttyS0", "/dev/ttyS1"};
@@ -109,6 +110,69 @@ static mraa_result_t mraa_roscube_init_uart(mraa_board_t* board, int index)
     return MRAA_SUCCESS;
 }
 
+int index_mapping(int index)
+{
+    return index + led_base;
+}
+void rqi_led_init (int index)
+{
+    FILE* export_file;
+    FILE* led_dir_file;
+    char  export_path[64];
+    char led_path_dir[64];
+
+    index = index_mapping(index);
+    snprintf(export_path,64,SYSFS_CLASS_GPIO "/export");
+    export_file = fopen(export_path, "w");
+    fprintf(export_file, "%d",index);
+    fclose(export_file);
+
+    snprintf(led_path_dir,64,SYSFS_CLASS_GPIO "/gpio%d/direction",index);
+    printf("%s",led_path_dir);
+    led_dir_file = fopen(led_path_dir, "w");
+    printf("a\n");
+    fprintf(led_dir_file, "%s","out");
+    fclose(led_dir_file);
+}
+
+mraa_result_t rqi_led_set_bright (int index, int val)
+{
+    FILE* led_val_file;
+    char led_path_val[64];
+    index = index_mapping(index);
+    snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%d/value",index);
+    led_val_file = fopen(led_path_val, "w");
+    fprintf(led_val_file,"%d",0);
+    fclose(led_val_file);
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t rqi_led_set_close(int index)
+{
+    FILE* unexport_file;
+    char  unexport_path[64];
+    index = index_mapping(index);
+    snprintf(unexport_path,64,SYSFS_CLASS_GPIO "/unexport");
+    unexport_file = fopen(unexport_path, "w");
+    fprintf(unexport_file,"%d",index);
+    fclose(unexport_file);
+    return MRAA_SUCCESS;
+}
+
+int rqi_led_check_bright (int index)
+{
+    FILE* led_val_file;
+    char led_path_val[64];
+    int buf;
+    index = index_mapping(index);
+    snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%i/value",index);
+    led_val_file = fopen(led_path_val, 'a+');
+    fread(buf, 1,1,led_val_file);
+    fclose(led_val_file);
+    return buf;
+}
+
+
 mraa_board_t* mraa_roscube_i()
 {
     int i, fd, i2c_bus_num;
@@ -125,6 +189,7 @@ mraa_board_t* mraa_roscube_i()
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_ROSCUBE_I_PINCOUNT;
     b->gpio_count = MRAA_ROSCUBE_GPIOCOUNT;
+    b->led_dev_count = MRAA_ROSCUBE_LEDCOUNT;
     b->chardev_capable = 0;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_ROSCUBE_I_PINCOUNT);
@@ -141,6 +206,10 @@ mraa_board_t* mraa_roscube_i()
     b->adv_func->gpio_isr_replace = NULL;
     b->adv_func->gpio_close_pre = NULL;
     b->adv_func->gpio_init_pre = NULL;
+    b->adv_func->led_init = rqi_led_init;
+    b->adv_func->led_set_bright = rqi_led_set_bright;
+    b->adv_func->led_set_close = rqi_led_set_close;
+    b->adv_func->led_check_bright = rqi_led_check_bright;
 
 
 
@@ -229,7 +298,7 @@ mraa_board_t* mraa_roscube_i()
     b->def_i2c_bus = 0;
 
     i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:15.0","i2c_designware.0");
-    printf("0: %d",i2c_bus_num);
+
     if (i2c_bus_num != -1) {
         b->i2c_bus[0].bus_id = i2c_bus_num;
         mraa_roscube_get_pin_index(b, "CON_I2C0_SDA", (int*) &(b->i2c_bus[0].sda));
@@ -238,7 +307,7 @@ mraa_board_t* mraa_roscube_i()
     }
 
     i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:15.1","i2c_designware.1");
-    printf("1: %d",i2c_bus_num);
+
     if (i2c_bus_num != -1) {
         b->i2c_bus[1].bus_id = i2c_bus_num;
         mraa_roscube_get_pin_index(b, "CON_I2C1_SDA", (int*) &(b->i2c_bus[1].sda));

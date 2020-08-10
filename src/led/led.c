@@ -26,6 +26,11 @@ mraa_led_get_trigfd(mraa_led_context dev)
 {
     char buf[MAX_SIZE];
 
+    if (IS_FUNC_DEFINED(dev,led_init))
+    {
+        syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
     snprintf(buf, MAX_SIZE, "%s/%s", dev->led_path, "trigger");
     dev->trig_fd = open(buf, O_RDWR);
     if (dev->trig_fd == -1) {
@@ -40,6 +45,12 @@ static mraa_result_t
 mraa_led_get_brightfd(mraa_led_context dev)
 {
     char buf[MAX_SIZE];
+
+    if (IS_FUNC_DEFINED(dev,led_init))
+    {
+        syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
 
     snprintf(buf, MAX_SIZE, "%s/%s", dev->led_path, "brightness");
     dev->bright_fd = open(buf, O_RDWR);
@@ -56,7 +67,14 @@ mraa_led_get_maxbrightfd(mraa_led_context dev)
 {
     char buf[MAX_SIZE];
 
-    snprintf(buf, MAX_SIZE, "%s/%s", dev->led_path, "max_brightness");
+snprintf(buf, MAX_SIZE, "%s/%s", dev->led_path, "max_brightness");
+    if (IS_FUNC_DEFINED(dev,led_init))
+    {
+        syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+
+
     dev->max_bright_fd = open(buf, O_RDONLY);
     if (dev->max_bright_fd == -1) {
         syslog(LOG_ERR, "led: max_brightness: Failed to open 'max_brightness': %s", strerror(errno));
@@ -136,6 +154,27 @@ mraa_led_init(int index)
         return NULL;
     }
 
+    if (plat->adv_func != NULL && plat->adv_func->led_init != NULL)
+    {
+        mraa_led_context dev = (mraa_led_context) calloc(1, sizeof(struct _led));
+        if (dev == NULL) {
+            syslog(LOG_CRIT, "led: init: Failed to allocate memory for context");
+            return NULL;
+        }
+        dev->led_name = NULL;
+        dev->trig_fd = -1;
+        dev->bright_fd = -1;
+        dev->max_bright_fd = -1;
+        dev->index = index;
+
+        dev->advance_func = plat->adv_func;
+        dev->count = plat->led_dev_count;
+        printf("b:%d\n",index);
+        plat->adv_func->led_init(index);
+
+        return dev;
+    }
+
     dev = mraa_led_init_internal((char*) plat->led_dev[index].name);
     if (dev == NULL) {
         return NULL;
@@ -156,6 +195,12 @@ mraa_led_init_raw(const char* led)
     mraa_led_context dev = NULL;
     char directory[MAX_SIZE];
     struct stat dir;
+
+    if (IS_FUNC_DEFINED(dev,led_init))
+    {
+        syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
+        return NULL;
+    }
 
     if (plat == NULL) {
         syslog(LOG_ERR, "led: init: platform not initialised");
@@ -187,6 +232,11 @@ mraa_led_set_brightness(mraa_led_context dev, int value)
     char buf[MAX_SIZE];
     int length;
 
+    if (IS_FUNC_DEFINED(dev,led_set_bright))
+    {
+        plat->adv_func->led_set_bright(dev->index,value);
+        return MRAA_SUCCESS;
+    }
     if (dev == NULL) {
         syslog(LOG_ERR, "led: set_brightness: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
@@ -227,6 +277,10 @@ mraa_led_read_brightness(mraa_led_context dev)
 {
     char buf[3];
 
+    if (IS_FUNC_DEFINED(dev, led_check_bright))
+    {
+        return plat->adv_func->led_check_bright(dev->index);
+    }
     if (dev == NULL) {
         syslog(LOG_ERR, "led: read_brightness: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
@@ -264,6 +318,10 @@ mraa_led_read_max_brightness(mraa_led_context dev)
 {
     char buf[3];
 
+    if (IS_FUNC_DEFINED(dev,led_set_bright))
+    {
+        return 1;
+    }
     if (dev == NULL) {
         syslog(LOG_ERR, "led: read_max_brightness: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
@@ -301,6 +359,12 @@ mraa_led_set_trigger(mraa_led_context dev, const char* trigger)
 {
     char buf[MAX_SIZE];
     int length;
+
+    if (IS_FUNC_DEFINED(dev,led_init))
+    {
+        syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
 
     if (dev == NULL) {
         syslog(LOG_ERR, "led: set_trigger: context is invalid");
@@ -347,6 +411,12 @@ mraa_led_clear_trigger(mraa_led_context dev)
 {
     char buf[1] = { '0' };
 
+    if (IS_FUNC_DEFINED(dev,led_init))
+    {
+        syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+
     if (dev == NULL) {
         syslog(LOG_ERR, "led: clear_trigger: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
@@ -385,6 +455,12 @@ mraa_led_clear_trigger(mraa_led_context dev)
 mraa_result_t
 mraa_led_close(mraa_led_context dev)
 {
+    if (IS_FUNC_DEFINED(dev,led_init))
+    {
+        syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+
     if (dev == NULL) {
         syslog(LOG_ERR, "led: close: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;

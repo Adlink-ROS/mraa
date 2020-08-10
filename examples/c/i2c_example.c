@@ -1,12 +1,8 @@
 /*
- * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
- * Copyright (c) 2018, Linaro Ltd.
+ * Author: Jeffrey Chang <chih-chieh.chang@adlinktech.com>
+ * Copyright (c) 2019 ADLINK Technology Inc.
  *
  * SPDX-License-Identifier: MIT
- *
- * Example usage: Outputs Accelerometer and Gyroscope value from MPU6050 recursively.
- *                Press Ctrl+C to exit.
- *
  */
 
 /* standard headers */
@@ -46,7 +42,7 @@ main(void)
     uint8_t data;
     int message = 2 ;
     int addr = 0x00;
-    int msg ,msg1;
+    int msg ;
     mraa_i2c_context i2c;
 
     /* install signal handler */

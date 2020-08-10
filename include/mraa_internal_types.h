@@ -278,6 +278,9 @@ struct _led {
     int trig_fd; /**< trigger file descriptor */
     int bright_fd; /**< brightness file descriptor */
     int max_bright_fd; /**< maximum brightness file descriptor */
+    /*Add by ADLINK*/
+    int index;
+    mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 };
 

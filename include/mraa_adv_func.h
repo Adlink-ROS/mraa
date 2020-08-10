@@ -10,7 +10,7 @@
 #include "common.h"
 #include "mraa.h"
 #include "types.h"
-
+//#include "mraa_internal.h"
 // FIXME: Nasty macro to test for presence of function in context structure function table
 #define IS_FUNC_DEFINED(dev, func)   (dev != NULL && dev->advance_func != NULL && dev->advance_func->func != NULL)
 
@@ -106,4 +106,8 @@ typedef struct {
     int (*uart_read_replace) (mraa_uart_context dev, char* buf, size_t len);
     int (*uart_write_replace)(mraa_uart_context dev, const char* buf, size_t len);
     mraa_boolean_t (*uart_data_available_replace) (mraa_uart_context dev, unsigned int millis);
+    mraa_result_t (*led_set_bright) (int index, int val);
+    mraa_result_t (*led_set_close) (int index );
+    void (*led_init) (int index);
+    int (*led_check_bright) (int index);
 } mraa_adv_func_t;
