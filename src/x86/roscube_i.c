@@ -128,9 +128,7 @@ void rqi_led_init (int index)
     fclose(export_file);
 
     snprintf(led_path_dir,64,SYSFS_CLASS_GPIO "/gpio%d/direction",index);
-    printf("%s",led_path_dir);
     led_dir_file = fopen(led_path_dir, "w");
-    printf("a\n");
     fprintf(led_dir_file, "%s","out");
     fclose(led_dir_file);
 }
@@ -142,7 +140,7 @@ mraa_result_t rqi_led_set_bright (int index, int val)
     index = index_mapping(index);
     snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%d/value",index);
     led_val_file = fopen(led_path_val, "w");
-    fprintf(led_val_file,"%d",0);
+    fprintf(led_val_file,"%d",val);
     fclose(led_val_file);
     return MRAA_SUCCESS;
 }
@@ -163,13 +161,13 @@ int rqi_led_check_bright (int index)
 {
     FILE* led_val_file;
     char led_path_val[64];
-    int buf;
+    char buf[64];
     index = index_mapping(index);
     snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%i/value",index);
-    led_val_file = fopen(led_path_val, 'a+');
-    fread(buf, 1,1,led_val_file);
+    led_val_file = fopen(led_path_val, "r");
+    fscanf(led_val_file,"%s",buf);
     fclose(led_val_file);
-    return buf;
+    return atoi(buf);
 }
 
 

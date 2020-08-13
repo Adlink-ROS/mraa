@@ -10,7 +10,6 @@
 #include "common.h"
 #include "mraa.h"
 #include "types.h"
-//#include "mraa_internal.h"
 // FIXME: Nasty macro to test for presence of function in context structure function table
 #define IS_FUNC_DEFINED(dev, func)   (dev != NULL && dev->advance_func != NULL && dev->advance_func->func != NULL)
 

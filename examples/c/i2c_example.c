@@ -71,11 +71,9 @@ main(void)
         sleep(1);
         msg = mraa_i2c_read_byte_data(i2c,addr);
 
-
         fprintf(stdout, "massage send to %d is %d\n", addr, message );
         fprintf(stdout, "message read from %d is %d\n\n", addr,msg);
 
-        //sleep(2);
         message +=3;
         addr +=1;
         if (addr== 0xff+1){

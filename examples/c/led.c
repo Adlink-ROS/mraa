@@ -27,7 +27,6 @@
 int
 main(void)
 {
-
     mraa_result_t status = MRAA_SUCCESS;
     mraa_led_context led;
     int val;

@@ -67,7 +67,7 @@ mraa_led_get_maxbrightfd(mraa_led_context dev)
 {
     char buf[MAX_SIZE];
 
-snprintf(buf, MAX_SIZE, "%s/%s", dev->led_path, "max_brightness");
+    snprintf(buf, MAX_SIZE, "%s/%s", dev->led_path, "max_brightness");
     if (IS_FUNC_DEFINED(dev,led_init))
     {
         syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
@@ -169,7 +169,6 @@ mraa_led_init(int index)
 
         dev->advance_func = plat->adv_func;
         dev->count = plat->led_dev_count;
-        printf("b:%d\n",index);
         plat->adv_func->led_init(index);
 
         return dev;
@@ -318,9 +317,10 @@ mraa_led_read_max_brightness(mraa_led_context dev)
 {
     char buf[3];
 
-    if (IS_FUNC_DEFINED(dev,led_set_bright))
+    if (IS_FUNC_DEFINED(dev,led_init))
     {
-        return 1;
+        syslog(LOG_ERR, "led: read_brightness: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
     }
     if (dev == NULL) {
         syslog(LOG_ERR, "led: read_max_brightness: context is invalid");
@@ -455,10 +455,10 @@ mraa_led_clear_trigger(mraa_led_context dev)
 mraa_result_t
 mraa_led_close(mraa_led_context dev)
 {
-    if (IS_FUNC_DEFINED(dev,led_init))
+    if (IS_FUNC_DEFINED(dev,led_set_close))
     {
-        syslog(LOG_ERR, "This function  can't be used on ROSCube-I!");
-        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+        plat->adv_func->led_set_close(dev->index);
+        return MRAA_SUCCESS;
     }
 
     if (dev == NULL) {
