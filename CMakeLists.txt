@@ -219,7 +219,7 @@ SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 ## Use RPATH while building
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 ## Set the RPATH
-SET(CMAKE_INSTALL_RPATH "/opt/neuron-library/lib/")
+SET(CMAKE_INSTALL_RPATH "/opt/adlink/neuron-sdk/neuron-library/lib/")
 ## Use RPATH while install
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -250,7 +250,7 @@ set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_NAME "neuron-library")
 # Set the installation location
 set(CPACK_SET_DESTDIR true)
-set(CPACK_INSTALL_PREFIX "/opt/neuron-library/")
+set(CPACK_INSTALL_PREFIX "/opt/adlink/neuron-sdk/neuron-library/")
 # Set where the deb is 
 set(CPACK_OUTPUT_FILE_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/build)
 # Maintainer
