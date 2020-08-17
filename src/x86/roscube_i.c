@@ -248,21 +248,21 @@ mraa_board_t* mraa_roscube_i()
     mraa_roscube_set_pininfo(b, 31, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 32, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 33, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 34, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 0);
-    mraa_roscube_set_pininfo(b, 35, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 1);
-    mraa_roscube_set_pininfo(b, 36, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 2);
-    mraa_roscube_set_pininfo(b, 37, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 3);
-    mraa_roscube_set_pininfo(b, 38, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 4);
-    mraa_roscube_set_pininfo(b, 39, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 5);
-    mraa_roscube_set_pininfo(b, 40, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 6);
-    mraa_roscube_set_pininfo(b, 41, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 7);
-    mraa_roscube_set_pininfo(b, 42, "CN_DO",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 8);
-    mraa_roscube_set_pininfo(b, 43, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 44, "CON_PORY0_CAN-H",   (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 34, "CN_DO0",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 0);
+    mraa_roscube_set_pininfo(b, 35, "CN_DO1",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 1);
+    mraa_roscube_set_pininfo(b, 36, "CN_DO2",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 2);
+    mraa_roscube_set_pininfo(b, 37, "CN_DO3",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 3);
+    mraa_roscube_set_pininfo(b, 38, "CN_DO4",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 4);
+    mraa_roscube_set_pininfo(b, 39, "CN_DO5",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 5);
+    mraa_roscube_set_pininfo(b, 40, "CN_DO6",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 6);
+    mraa_roscube_set_pininfo(b, 41, "CN_DO7",             (mraa_pincapabilities_t){  1, 1, 0, 0, 0, 0, 0, 0 }, base2 + 7);
+    mraa_roscube_set_pininfo(b, 42, "GND",               (mraa_pincapabilities_t){ -1, 1, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 43, "CON_PORT0_CAN-H",  (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 44, "CON_PORT1_CAN-H",   (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 45, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 46, "PCH_I2C0_GPIO",     (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);   // not GPIO
+    mraa_roscube_set_pininfo(b, 46, "unused",            (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 47, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 48, "PCH_AFM_GPIO5",     (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);   // not GPIO
+    mraa_roscube_set_pininfo(b, 48, "unused",            (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 49, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 50, "GND",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     
