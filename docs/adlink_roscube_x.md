@@ -15,26 +15,28 @@ ADLINK ROScube-X ARM
 
 | Linux GPIO (/sys/class/gpio) | Function  | MRAA number | MRAA number | Function  | Linux GPIO (/sys/class/gpio) |
 | :--------------------------: | :-------: | :---------: | :---------: | :-------: | :--------------------------: |
-|                              | Not Used  |      1      |      2      | Not Used  |                              |
+|                              |ADC1_isolate|     1      |      2      |ADC2_isolate|                              |
 |                              | Not Used  |      3      |      4      | Not Used  |                              |
-|                              | Not Used  |      5      |      6      | Not Used  |                              |
-|             216              |   GPIO0   |      7      |      8      |   GPIO1   |             217              |
-|             218              |   GPIO2   |      9      |     10      |   GPIO3   |             219              |
-|             220              |   GPIO4   |     11      |     12      |   GPIO5   |             221              |
-|             222              |   GPIO6   |     13      |     14      |   GPIO7   |             223              |
-|             224              |   GPIO8   |     15      |     16      |   GPIO9   |             225              |
-|             226              |   GPIO10  |     17      |     18      |   GPIO11  |             227              |
-|             228              |   GPIO12  |     19      |     20      |   GPIO13  |             229              |
-|             230              |   GPIO14  |     21      |     22      |   GPIO15  |             231              |
-|             232              |   GPIO16  |     23      |     24      |   GPIO17  |             233              |
-|             234              |   GPIO18  |     25      |     26      |   GPIO19  |             235              |
-|                              |   CAN_TX  |     27      |     28      | SPI0_SCK  |                              |
-|                              |   CAN_RX  |     29      |     30      | SPI0_MISO |                              |
-|                              |   CANH    |     31      |     32      | SPI0_MOSI |                              |
-|                              |   CANL    |     33      |     34      | SPI0_CS   |                              |
-|                              |   PWM     |     35      |     36      | I2C0_SDA  |                              |
-|                              |   5V DC   |     37      |     38      | I2C0_SCL  |                              |
-|                              |   5V DC   |     39      |     40      | 3.3V DC   |                              |
-|                              |   GND     |     41      |     42      |    GND    |                              |
-|                              |   GND     |     43      |     44      |    GND    |                              |
-
+|             216              |   GPIO0   |      5      |      6      |   GPIO1   |             217              |
+|             218              |   GPIO2   |      7      |      8      |   GPIO3   |             219              |
+|             220              |   GPIO4   |      9      |     10      |   GPIO5   |             221              |
+|             222              |   GPIO6   |     11      |     12      |   GPIO7   |             223              |
+|             224              |   GPIO8   |     13      |     14      |   GPIO9   |             225              |
+|             226              |   GPIO10  |     15      |     16      |   GPIO11  |             227              |
+|             228              |   GPIO12  |     17      |     18      |    GND    |                              |
+|                              | Not Used  |     19      |     20      | Not Used  |                              |
+|                              | Not Used  |     21      |     22      |   PWM     |                              |
+|                              | SPI0_CLK  |     23      |     24      |  SPI0_CS  |                              |
+|                              | SPI0_MISO |     25      |     26      | SPI0_MOSI |                              |
+|             229              |   GPIO13  |     27      |     28      |   GPIO14  |             230              |
+|             231              |   GPIO15  |     29      |     30      |   GPIO16  |             233              |
+|             234              |   GPIO17  |     31      |     32      |   GPIO18  |             235              |
+|             236              |   GPIO19  |     33      |     34      |    GND    |                              |
+|                              | Not Used  |     35      |     36      | Not Used  |                              |
+|                              | Not Used  |     37      |     38      |   CAN_RX  |                              |
+|                              |   CAN_TX  |     39      |     40      |   CAN_H   |                              |
+|                              |   CAN_L   |     41      |     42      |  I2C_CLK  |                              |
+|                              |  I2C_DATA |     43      |     44      |   5V DC   |                              |
+|                              |   5V DC   |     45      |     46      | 3.3V DC   |                              |
+|                              |   GND     |     47      |     48      |    GND    |                              |
+|                              |   GND     |     49      |     50      |    GND    |                              |
