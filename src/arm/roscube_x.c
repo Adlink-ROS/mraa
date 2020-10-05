@@ -262,32 +262,20 @@ mraa_board_t* mraa_roscube_x()
     mraa_roscube_get_pin_index(b, "SPI_0_MISO", &(b->spi_bus[b->spi_bus_count].miso));
     mraa_roscube_get_pin_index(b, "SPI_0_SCLK",  &(b->spi_bus[b->spi_bus_count].sclk));
     b->spi_bus_count++;
-
+#endif
     // Set number of i2c adaptors usable from userspace
     b->i2c_bus_count = 0;
     b->def_i2c_bus = 0;
 
-    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.1", "i2c_designware.1");
+    i2c_bus_num = mraa_find_i2c_bus("31e0000.i2c",0);
     if (i2c_bus_num != -1) {
-        if(sx150x_init(i2c_bus_num) < 0)
-        {
-            _fd = -1;
-        }
-
         b->i2c_bus[0].bus_id = i2c_bus_num;
-        mraa_roscube_get_pin_index(b, "I2C1_DAT", (int*) &(b->i2c_bus[1].sda));
-        mraa_roscube_get_pin_index(b, "I2C1_CK", (int*) &(b->i2c_bus[1].scl));
+        mraa_roscube_get_pin_index(b, "I2C_CLK", (int*) &(b->i2c_bus[0].sda));
+        mraa_roscube_get_pin_index(b, "I2C_DATA", (int*) &(b->i2c_bus[0].scl));
         b->i2c_bus_count++;
     }
 
-    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:1f.1", ".");
-    if (i2c_bus_num != -1) {
-        b->i2c_bus[1].bus_id = i2c_bus_num;
-        mraa_roscube_get_pin_index(b, "I2C0_DAT", (int*) &(b->i2c_bus[0].sda));
-        mraa_roscube_get_pin_index(b, "I2C0_CK", (int*) &(b->i2c_bus[0].scl));
-        b->i2c_bus_count++;
-    }
-
+#if 0 
     const char* pinctrl_path = "/sys/bus/platform/drivers/broxton-pinctrl";
     int have_pinctrl = access(pinctrl_path, F_OK) != -1;
     syslog(LOG_NOTICE, "ROSCUBE X: kernel pinctrl driver %savailable", have_pinctrl ? "" : "un");
