@@ -41,15 +41,15 @@
 #define PLATFORM_NAME "ROSCUBE-X"
 
 #define MRAA_ROSCUBE_GPIOCOUNT 20
-#define MRAA_ROSCUBE_UARTCOUNT 4
+#define MRAA_ROSCUBE_UARTCOUNT 3
 #define MRAA_ROSCUBE_X_LEDCOUNT 6
 #define MAX_SIZE 64
 #define POLL_TIMEOUT
 const char* ROSCube_X_LED[MRAA_ROSCUBE_X_LEDCOUNT] = { "LED1", "LED2", "LED3","LED4", "LED5", "LED6"};
 static volatile int base1, base2, _fd;
 static mraa_gpio_context gpio;
-static char* uart_name[MRAA_ROSCUBE_UARTCOUNT] = {"COM1", "COM2"};
-static char* uart_path[MRAA_ROSCUBE_UARTCOUNT] = {"/dev/ttyUSB0", "/dev/ttyUSB1"};
+static char* uart_name[MRAA_ROSCUBE_UARTCOUNT] = {"COM1", "COM2","COM3_DB50" };
+static char* uart_path[MRAA_ROSCUBE_UARTCOUNT] = {"/dev/ttyUSB0", "/dev/ttyUSB1","/dev/ttyTHS0"};
 
 // utility function to setup pin mapping of boards
 static mraa_result_t mraa_roscube_set_pininfo(mraa_board_t* board, int mraa_index, char* name,
