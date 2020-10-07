@@ -40,3 +40,11 @@ ADLINK ROScube-X ARM
 |                              |   5V DC   |     45      |     46      | 3.3V DC   |                              |
 |                              |   GND     |     47      |     48      |    GND    |                              |
 |                              |   GND     |     49      |     50      |    GND    |                              |
+
+
+## Serial port mapping
+ |    Serial port   | MRAA number | Bash Path  |
+ |:----------------:|:-----------:|:----------:|
+ |       COM1       |      0      |/dev/ttyUSB0|
+ |       COM2       |      1      |/dev/ttyUSB1|
+ |   UART on DB50   |      2      |/dev/ttyTHS0|
