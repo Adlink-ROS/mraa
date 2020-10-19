@@ -155,39 +155,20 @@ mraa_board_t* mraa_roscube_x()
     b->adv_func->pwm_enable_replace = pwm_enable_replace;
 #endif
 
-#if 0
-    for(i = 0; i < 999; i++) {
-        sprintf(buffer,"/sys/class/gpio/gpiochip%d/device/name",i);
-        if((fd = open(buffer, O_RDONLY)) != -1) {
-            int count = read(fd,buffer,7);
-            if(count != 0) {
-                // GPIO 16-19
-                if(strncmp(buffer, "pca9534", count) == 0) {
-                    base2 = i;
-                }
-                // GPIO 0-15
-                if(strncmp(buffer, "pca9535", count) == 0) {
-                    base1 = i;
-                }
-            }
-            close(fd);
-        }
-    }
-#else
     // We fix the base currently.
     base1 = 216;
-#endif
+
 
     syslog(LOG_NOTICE, "ROSCubeX: base1 %d base2 %d\n", base1, base2);
 
 // TODO: check PWM
-#if 0
+
     // Configure PWM
     b->pwm_dev_count = 0;
     b->pwm_default_period = 5000;
-    b->pwm_max_period = 218453;
+    b->pwm_max_period = 660066006;
     b->pwm_min_period = 1;
-#endif
+
 
     mraa_roscube_set_pininfo(b, 1,  "ADC1_isolation", (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 2,  "ADC2_isolation", (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
