@@ -217,13 +217,13 @@ mraa_board_t* mraa_roscube_x()
 
 
     // Configure SPI #0 CS1
-    b->spi_bus_count = 0;
-    b->spi_bus[b->spi_bus_count].bus_id = 1;
-    b->spi_bus[b->spi_bus_count].slave_s = 0;  //slave select
-    mraa_roscube_get_pin_index(b, "SPI_CS",  &(b->spi_bus[b->spi_bus_count].cs));
-    mraa_roscube_get_pin_index(b, "SPI_MOSI", &(b->spi_bus[b->spi_bus_count].mosi));
-    mraa_roscube_get_pin_index(b, "SPI_MISO", &(b->spi_bus[b->spi_bus_count].miso));
-    mraa_roscube_get_pin_index(b, "SPI_CLK",  &(b->spi_bus[b->spi_bus_count].sclk));
+    b->spi_bus_count = 1;
+    b->spi_bus[0].bus_id = 0;
+    b->spi_bus[0].slave_s = 0;  //slave select
+    mraa_roscube_get_pin_index(b, "SPI_CS",  &(b->spi_bus[0].cs));
+    mraa_roscube_get_pin_index(b, "SPI_MOSI", &(b->spi_bus[0].mosi));
+    mraa_roscube_get_pin_index(b, "SPI_MISO", &(b->spi_bus[0].miso));
+    mraa_roscube_get_pin_index(b, "SPI_CLK",  &(b->spi_bus[0].sclk));
 
     // Set number of i2c adaptors usable from userspace
     b->i2c_bus_count = 0;

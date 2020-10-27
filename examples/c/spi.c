@@ -24,9 +24,9 @@
 /* SPI frequency in Hz */
 #define SPI_FREQ 400000
 
-uint16_t pat[] = { 0x01aa, 0x0255, 0x03aa, 0x0455, 0x05aa, 0x0655, 0x07aa, 0x0855 };
-uint16_t pat_inv[] = { 0x0155, 0x02aa, 0x0355, 0x04aa, 0x0555, 0x06aa, 0x0755, 0x08aa };
-uint16_t pat_clear[] = { 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800 };
+uint16_t pat[] = { 0xaa01, 0x5502, 0xaa03, 0x5504, 0xaa05, 0x5506, 0xaa07, 0x5508 };
+uint16_t pat_inv[] = { 0x5501, 0xaa02, 0x5503, 0xaa04, 0x5505, 0xaa06, 0x5507, 0xaa08 };
+uint16_t pat_clear[] = { 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008 };
 
 volatile sig_atomic_t flag = 1;
 
@@ -77,38 +77,45 @@ main(int argc, char** argv)
     }
 
     /* do not decode bits */
-    mraa_spi_write_word(spi, 0x0900);
+    mraa_spi_write_word(spi, 0x0009);  //0x9 is for Decode mode, an 8x8 LEDs should be set to 0x00
 
     /* brightness of LEDs */
-    mraa_spi_write_word(spi, 0x0a05);
+    mraa_spi_write_word(spi, 0x050a);  //0xA is for intersity, could be set from 0x0 to 0xF and 0xF is the brightest.
 
     /* show all scan lines */
-    mraa_spi_write_word(spi, 0x0b07);
+    mraa_spi_write_word(spi, 0x070b);  //0xB is for Scan, means how many EEPROM you want to open. 
 
     /* set display on */
-    mraa_spi_write_word(spi, 0x0c01);
+    mraa_spi_write_word(spi, 0x010c); //0xC: set to 0x0 for shutdown, 0x1 for open.
 
     /* testmode off */
-    mraa_spi_write_word(spi, 0x0f00);
+    mraa_spi_write_word(spi, 0x000f); //0xF is for test mode, if set to 0x0 every LED will set bright.
 
     while (flag) {
         /* set display pattern */
-        mraa_spi_write_buf_word(spi, pat, 16);
-
+        for(i=0;i<sizeof(pat);i++)
+        {
+        mraa_spi_write_word(spi, pat[i]);
+        }
         sleep(2);
 
         /* set inverted display pattern */
-        mraa_spi_write_buf_word(spi, pat_inv, 16);
-
+        for(i=0;i<sizeof(pat_inv);i++)
+        {
+        mraa_spi_write_word(spi, pat_inv[i]);
+        }
         sleep(2);
 
         /* clear the LED's */
-        mraa_spi_write_buf_word(spi, pat_clear, 16);
+        for(i=0;i<sizeof(pat_clear);i++)
+        {
+        mraa_spi_write_word(spi, pat_clear[i]);
+        }
 
         /* cycle through all LED's */
         for (i = 1; i <= 8; i++) {
             for (j = 0; j < 8; j++) {
-                mraa_spi_write_word(spi, (i << 8) + (1 << j));
+                mraa_spi_write_word(spi, i  + (1 << (j+8)));
                 sleep(1);
             }
             mraa_spi_write_word(spi, i << 8);
