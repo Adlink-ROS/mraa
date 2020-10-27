@@ -95,21 +95,21 @@ main(int argc, char** argv)
         /* set display pattern */
         for(i=0;i<sizeof(pat);i++)
         {
-        mraa_spi_write_word(spi, pat[i]);
+            mraa_spi_write_word(spi, pat[i]);
         }
         sleep(2);
 
         /* set inverted display pattern */
         for(i=0;i<sizeof(pat_inv);i++)
         {
-        mraa_spi_write_word(spi, pat_inv[i]);
+            mraa_spi_write_word(spi, pat_inv[i]);
         }
         sleep(2);
 
         /* clear the LED's */
         for(i=0;i<sizeof(pat_clear);i++)
         {
-        mraa_spi_write_word(spi, pat_clear[i]);
+            mraa_spi_write_word(spi, pat_clear[i]);
         }
 
         /* cycle through all LED's */
