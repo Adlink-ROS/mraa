@@ -1,0 +1,23 @@
+
+Changelog for Neuron APP navigation
+===================================
+
+v1.3.1
+-------------------
+1. Add Changelog to deb installation path.
+
+v1.3.0
+-------------------
+1. Support SPI for ROScube-X.
+
+v1.2.0
+-------------------
+1. Support ROScube-X.
+
+v1.1.0
+-------------------
+1. Support ROScube-I.
+
+v1.0.0
+-------------------
+1. First Release.

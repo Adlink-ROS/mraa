@@ -222,6 +222,8 @@ SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 SET(CMAKE_INSTALL_RPATH "/opt/adlink/neuron-sdk/neuron-library/lib/")
 ## Use RPATH while install
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# Add ADLINKE_CHANGELOG to install path
+install (FILES ${PROJECT_SOURCE_DIR}/ADLINK_CHANGELOG DESTINATION .)
 
 add_subdirectory (src)
 if (ENABLEEXAMPLES)
@@ -245,7 +247,7 @@ endif()
 ## Set the package type
 set(CPACK_GENERATOR "DEB")
 ## Set the package version
-set(CPACK_PACKAGE_VERSION "1.2.0")
+set(CPACK_PACKAGE_VERSION "1.3.1")
 # Set the package name
 set(CPACK_PACKAGE_NAME "neuron-library")
 # Set the package file format
