@@ -17,7 +17,7 @@ extern "C" {
 #include "mraa_internal.h"
 
 // +1 as pins are "1 indexed"
-#define MRAA_ROSCUBE_I_PINCOUNT    (44 + 1)
+#define MRAA_ROSCUBE_I_PINCOUNT    (50 + 1)
 
 mraa_board_t*
 mraa_roscube_i();

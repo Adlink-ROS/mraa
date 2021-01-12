@@ -232,8 +232,8 @@ mraa_board_t* mraa_roscube_x()
     i2c_bus_num = mraa_find_i2c_bus("31e0000.i2c",0);
     if (i2c_bus_num != -1) {
         b->i2c_bus[0].bus_id = i2c_bus_num;
-        mraa_roscube_get_pin_index(b, "I2C_CLK", (int*) &(b->i2c_bus[0].sda));
-        mraa_roscube_get_pin_index(b, "I2C_DATA", (int*) &(b->i2c_bus[0].scl));
+        mraa_roscube_get_pin_index(b, "I2C_DATA", (int*) &(b->i2c_bus[0].sda));
+        mraa_roscube_get_pin_index(b, "I2C_CLK", (int*) &(b->i2c_bus[0].scl));
         b->i2c_bus_count++;
     }
 

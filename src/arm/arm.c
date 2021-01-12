@@ -19,6 +19,7 @@
 #include "arm/adlink_ipi.h"
 #include "mraa_internal.h"
 #include "arm/roscube_x.h"
+#include "arm/roscube_pico_nx.h"
 
 
 mraa_platform_t
@@ -72,7 +73,18 @@ mraa_arm_platform()
     }
     free(line);
 #else
-    platform_type = MRAA_ADLINK_ROSCUBE_X;
+    FILE *fh = fopen("/proc/device-tree/model", "r");;
+    char model_name[200];
+    fgets(model_name, 200, fh); 
+    fclose(fh);
+    //printf("%s",&model_name);
+    if ( strcmp(model_name , "ADLINK ROScube-Pico NX Development Kit")==0){
+        platform_type = MRAA_ADLINK_ROSCUBE_PICO_NX;
+    }
+    else{
+        platform_type = MRAA_ADLINK_ROSCUBE_X;
+    }
+        
 #endif
 
     /* Get compatible string from Device tree for boards that dont have enough info in /proc/cpuinfo
@@ -134,6 +146,9 @@ mraa_arm_platform()
 	    case MRAA_ADLINK_ROSCUBE_X:
 	        plat = mraa_roscube_x();
 	        break;
+        case MRAA_ADLINK_ROSCUBE_PICO_NX:
+            plat = mraa_roscube_pico_nx();
+            break;
         default:
             plat = NULL;
             syslog(LOG_ERR, "Unknown Platform, currently not supported by MRAA");
