@@ -160,8 +160,8 @@ mraa_board_t* mraa_roscube_pico_nx()
     mraa_roscube_set_pininfo(b, 7,  "DEBUG_CONSOLE_TX", (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 8,  "DEBUG_CONSOLE_RX", (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 9,  "GND",              (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 10, "I2C0_SCL",          (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 11, "I2C0_SDA",          (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 10, "I2C0_SCL",         (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 11, "I2C0_SDA",         (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 12, "SPI0_CS1",         (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 13, "SPI0_CS0",         (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 14, "GND",              (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
@@ -185,7 +185,7 @@ mraa_board_t* mraa_roscube_pico_nx()
     mraa_roscube_set_pininfo(b, 32, "MOSI0",            (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 33, "3.3V",             (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 34, "GND",              (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_roscube_set_pininfo(b, 35, "I2C1_SCL",          (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, -1);
+    mraa_roscube_set_pininfo(b, 35, "I2C1_SCL",         (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 36, "I2C1_SDA",         (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 37, "3.3V",             (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
    
@@ -193,7 +193,6 @@ mraa_board_t* mraa_roscube_pico_nx()
     for (int i = 0; i < MRAA_ROSCUBE_UARTCOUNT; i++)
         mraa_roscube_init_uart(b, i);
     b->def_uart_dev = 0;
-
 
     // Configure SPI
 	b->spi_bus_count = 0;
