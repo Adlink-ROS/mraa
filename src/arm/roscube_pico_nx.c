@@ -1,10 +1,8 @@
  /*
- * Author: Chih-Chieh Chang <chih-chieh.chang@adlinktech.com>
-
- * Copyright (c) 2019 ADLINK Technology Inc.
- * SPDX-License-Identifier: MIT
-
-*/
+  * Author: Chih-Chieh Chang <chih-chieh.chang@adlinktech.com>
+  * Copyright (c) 2021 ADLINK Technology Inc.
+  * SPDX-License-Identifier: MIT
+  */
 
 #include <ctype.h>
 #include <errno.h>
@@ -140,16 +138,13 @@ mraa_board_t* mraa_roscube_pico_nx()
     // We fix the base currently.
     base1 = 231;
 
-
     syslog(LOG_NOTICE, "ROSCubeX: base1 %d base2 %d\n", base1);
-
 
     // Configure PWM
     b->pwm_dev_count = 5;
     b->pwm_default_period = 5000;
     b->pwm_max_period = 660066006;
     b->pwm_min_period = 1;
-
 
     mraa_roscube_set_pininfo(b, 1,  "5V",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 2,  "GND",              (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
@@ -195,22 +190,22 @@ mraa_board_t* mraa_roscube_pico_nx()
     b->def_uart_dev = 0;
 
     // Configure SPI
-	b->spi_bus_count = 0;
-	b->spi_bus[b->spi_bus_count].bus_id = 1;
-	b->spi_bus[b->spi_bus_count].slave_s = 0;
-	mraa_roscube_get_pin_index(b, "SPI0_CS0",  &(b->spi_bus[b->spi_bus_count].cs));
-	mraa_roscube_get_pin_index(b, "MOSI0", &(b->spi_bus[b->spi_bus_count].mosi));
-	mraa_roscube_get_pin_index(b, "MISO0", &(b->spi_bus[b->spi_bus_count].miso));
-	mraa_roscube_get_pin_index(b, "SPI_CLK",  &(b->spi_bus[b->spi_bus_count].sclk));
-	b->spi_bus_count++;
+    b->spi_bus_count = 0;
+    b->spi_bus[b->spi_bus_count].bus_id = 1;
+    b->spi_bus[b->spi_bus_count].slave_s = 0;
+    mraa_roscube_get_pin_index(b, "SPI0_CS0",  &(b->spi_bus[b->spi_bus_count].cs));
+    mraa_roscube_get_pin_index(b, "MOSI0", &(b->spi_bus[b->spi_bus_count].mosi));
+    mraa_roscube_get_pin_index(b, "MISO0", &(b->spi_bus[b->spi_bus_count].miso));
+    mraa_roscube_get_pin_index(b, "SPI_CLK",  &(b->spi_bus[b->spi_bus_count].sclk));
+    b->spi_bus_count++;
 
-	b->spi_bus[b->spi_bus_count].bus_id = 1;
-	b->spi_bus[b->spi_bus_count].slave_s = 1;
-	mraa_roscube_get_pin_index(b, "SPI0_CS1",  &(b->spi_bus[b->spi_bus_count].cs));
-	mraa_roscube_get_pin_index(b, "MOSI0", &(b->spi_bus[b->spi_bus_count].mosi));
-	mraa_roscube_get_pin_index(b, "MISO0", &(b->spi_bus[b->spi_bus_count].miso));
-	mraa_roscube_get_pin_index(b, "SPI_CLK",  &(b->spi_bus[b->spi_bus_count].sclk));
-	b->spi_bus_count++;
+    b->spi_bus[b->spi_bus_count].bus_id = 1;
+    b->spi_bus[b->spi_bus_count].slave_s = 1;
+    mraa_roscube_get_pin_index(b, "SPI0_CS1",  &(b->spi_bus[b->spi_bus_count].cs));
+    mraa_roscube_get_pin_index(b, "MOSI0", &(b->spi_bus[b->spi_bus_count].mosi));
+    mraa_roscube_get_pin_index(b, "MISO0", &(b->spi_bus[b->spi_bus_count].miso));
+    mraa_roscube_get_pin_index(b, "SPI_CLK",  &(b->spi_bus[b->spi_bus_count].sclk));
+    b->spi_bus_count++;
 
     // Set number of i2c adaptors usable from userspace
     b->i2c_bus_count =0;
