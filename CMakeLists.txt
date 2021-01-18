@@ -224,6 +224,9 @@ SET(CMAKE_INSTALL_RPATH "/opt/adlink/neuron-sdk/neuron-library/lib/")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Add ADLINKE_CHANGELOG to install path
 install (FILES ${PROJECT_SOURCE_DIR}/ADLINK_CHANGELOG DESTINATION .)
+install (FILES ${PROJECT_SOURCE_DIR}/99-roscube-device.rules DESTINATION "/etc/udev/rules.d")
+
+SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resource_udev.sh")
 
 add_subdirectory (src)
 if (ENABLEEXAMPLES)
