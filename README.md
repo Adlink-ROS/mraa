@@ -48,6 +48,7 @@ ARM
 * [96Boards](../master/docs/96boards.md)
 * [ADLINK IPi-SMARC ARM](../master/docs/adlink_ipi_arm.md)
 * [ADLINK ROScube-X](../roscube_series/docs/adlink_roscube_x.md)
+* [ADLINK ROScube PICO NX](../roscube_series/docs/adlink_roscube_pico_nx.md)
 * [Rock Pi 4](../master/docs/rockpi4.md)
 
 MIPS
