@@ -42,11 +42,340 @@
 
 #define MAX_SIZE 64
 #define POLL_TIMEOUT
-//const char* ROSCube_X_LED[MRAA_ROSCUBE_X_LEDCOUNT] = { "LED1", "LED2", "LED3","LED4", "LED5", "LED6"};
 static volatile int base1,_fd;
 static mraa_gpio_context gpio;
 static char* uart_name[MRAA_ROSCUBE_UARTCOUNT] = {"COM1" };
 static char* uart_path[MRAA_ROSCUBE_UARTCOUNT] = {"/dev/ttyTHS1"};
+static unsigned char regIon[5]   = {0x45, 0x40, 0x3B, 0x36, 0x33};
+
+static unsigned int  IonValue[5]   = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+//pwm replace function for sm1509 
+static int sx150x_pwm_init(int);
+//
+//static int
+//mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
+//{
+//    char bu[MAX_SIZE];
+//    snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
+//
+//    dev->duty_fp = open(bu, O_RDWR);
+//    if (dev->duty_fp == -1) {
+//        return 1;
+//    }
+//    return 0;
+//}
+
+int _tperiod;
+
+static mraa_result_t pwm_period_replace(mraa_pwm_context dev, int period)
+{
+	_tperiod = period;
+	return MRAA_SUCCESS;
+}
+
+static float pwm_read_replace(mraa_pwm_context dev)
+{
+        unsigned char rx_tx_buf[3] = {0};
+
+        if(dev->pin < 9)
+        {
+                if(_fd == -1)
+                {
+                        return 0;
+                }
+
+                rx_tx_buf[0] = regIon[dev->pin];
+                if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
+                {
+                        if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
+                        {
+                                return (rx_tx_buf[1] / 2.55);
+                        }
+                }
+        }
+        return 0;
+}
+
+static mraa_result_t pwm_write_replace(mraa_pwm_context dev, float duty)
+{
+        unsigned char rx_tx_buf[3] = {0};
+
+	IonValue[dev->pin] = ((duty /_tperiod) * 255);
+	
+        if(dev->pin < 9)
+        {
+                if(_fd == -1)
+                {
+                        return MRAA_ERROR_INVALID_RESOURCE;
+                }
+
+                rx_tx_buf[0] = regIon[dev->pin];
+                rx_tx_buf[1] = IonValue[dev->pin];
+
+                if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
+                {
+                        return MRAA_ERROR_NO_RESOURCES;
+                }
+                return MRAA_SUCCESS;
+        }
+        return MRAA_ERROR_NO_RESOURCES;
+}
+
+
+static mraa_result_t pwm_enable_replace(mraa_pwm_context dev, int enable)
+{
+        int pin = dev->pin;
+
+        if(5 > pin && 0 <= pin)
+        {
+                if(_fd != -1)
+                {
+                        unsigned char rx_tx_buf[3] = {0};
+
+                        if(_fd == -1)
+                        {
+                                return MRAA_ERROR_NO_RESOURCES;
+                        }
+
+                        rx_tx_buf[0] = regIon[pin];
+                        rx_tx_buf[1] = IonValue[pin];
+                        if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
+                        {
+                                return MRAA_ERROR_NO_RESOURCES;
+                        }
+                }
+                else
+                {
+                        return MRAA_ERROR_NO_RESOURCES;
+                }
+
+                return MRAA_SUCCESS;
+        }
+        return MRAA_ERROR_NO_RESOURCES;
+}
+
+static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
+{
+	char buffer[100] = {0};
+	int i, fd;
+	syslog(LOG_WARNING, "pwm_init: pwm%i. chip info %d.", pin, dev->chipid);
+
+	//if(dev->chipid == 1 || dev->chipid == 2)
+	//{
+	//	dev->advance_func->pwm_period_replace = NULL;
+	//	dev->advance_func->pwm_read_replace = NULL;
+	//	dev->advance_func->pwm_write_replace = NULL;
+	//	dev->advance_func->pwm_enable_replace = NULL;
+//
+	//	char directory[MAX_SIZE];
+	//	snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
+	//	struct stat dir;
+	//	if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
+	//		syslog(LOG_NOTICE, "pwm_init: pwm%i already exported, continuing", pin);
+	//		dev->owner = 0; // Not Owner
+	//	} else {
+	//		char buffer[MAX_SIZE];
+	//		snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
+	//		int export_f = open(buffer, O_WRONLY);
+	//		if (export_f == -1) {
+	//			syslog(LOG_ERR, "pwm_init: pwm%i. Failed to open export for writing: %s", pin, strerror(errno));
+	//			free(dev);
+	//			return MRAA_ERROR_INVALID_RESOURCE;
+	//		}
+//
+	//		char out[MAX_SIZE];
+	//		int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
+	//		if (write(export_f, out, size * sizeof(char)) == -1) {
+	//			syslog(LOG_WARNING, "pwm_init: pwm%i. Failed to write to export! (%s) Potentially already in use.", pin, strerror(errno));
+	//			close(export_f);
+	//			free(dev);
+	//			return MRAA_ERROR_INVALID_RESOURCE;
+	//		}
+	//		dev->owner = 1;
+	//		mraa_pwm_period_us(dev, 0xFF);
+	//		close(export_f);
+	//	}
+//
+	//	mraa_pwm_setup_duty_fp(dev);
+//
+	//	return MRAA_SUCCESS;
+	//}else if(dev->chipid == 3)
+	//{
+	dev->advance_func->pwm_period_replace = pwm_period_replace;
+	dev->advance_func->pwm_read_replace = pwm_read_replace;
+	dev->advance_func->pwm_write_replace = pwm_write_replace;
+	dev->advance_func->pwm_enable_replace = pwm_enable_replace;
+
+	if(pin < 5)
+	{
+		if(sx150x_pwm_init(pin))
+		{
+				return MRAA_ERROR_NO_RESOURCES;
+		}
+		if((fd = open("/sys/class/gpio/unexport", O_WRONLY)) != -1)
+		{
+			//i = sprintf(buffer,"%d",base2 + pin);
+			write(fd, buffer, i);
+			close(fd);
+		}
+		if((fd = open("/sys/class/gpio/export", O_WRONLY)) != -1)
+		{
+			i = sprintf(buffer,"%d",base1 + pin);
+			write(fd, buffer, i);
+			close(fd);
+			sprintf(buffer,"/sys/class/gpio/gpio%d/direction",base1 + pin);
+			if((fd = open(buffer, O_WRONLY)) != -1)
+			{
+				write(fd, "out", 3);
+				close(fd);
+				sprintf(buffer,"/sys/class/gpio/gpio%d/value",base1 + pin);
+				if((fd = open(buffer, O_WRONLY)) != -1)
+				{
+					write(fd, "0", 1);
+					close(fd);
+				}
+			}
+		}
+		else
+		{
+			return MRAA_ERROR_NO_RESOURCES;
+		}
+		return MRAA_SUCCESS;
+	}
+	else
+	{
+		return MRAA_ERROR_NO_RESOURCES;
+	}
+	//}
+	return MRAA_ERROR_NO_RESOURCES;
+}
+static int sx150x_init()
+{
+        char rx_tx_buf[100] = {0};
+	int i, bus_num, fd;
+
+        for(i = 0; i < 999; i++)
+	{
+		sprintf(rx_tx_buf,"/sys/class/gpio/gpiochip%d/device/name",i);
+		if((fd = open(rx_tx_buf, O_RDONLY)) != -1)
+		{
+			int count = read(fd, rx_tx_buf, 7);
+			if(count != 0)
+			{
+				if(strncmp(rx_tx_buf, "sx1509q", count) == 0)
+				{
+					base1 = i;
+					break;
+				}
+			}
+			close(fd);
+		}
+	}
+
+	for(i = 0; i < 999;i++)
+	{
+		sprintf(rx_tx_buf,"/sys/bus/i2c/devices/%x-003e/name",i);
+		if((fd = open(rx_tx_buf, O_RDONLY)) != -1)
+		{
+			int count = read(fd, rx_tx_buf, 7);
+			if(count != 0)
+			{
+				if(strncmp(rx_tx_buf, "sx1509q", count) == 0)
+				{
+					bus_num = i;
+					break;
+				}
+			}
+			close(fd);
+		}
+	}
+
+        sprintf(rx_tx_buf, "/dev/i2c-%d",bus_num);
+        if((_fd = open(rx_tx_buf, O_RDWR)) < 0)
+        {
+                return -1;
+        }
+
+        if(ioctl(_fd, I2C_SLAVE_FORCE, 0x3E) < 0)
+        {
+                return -1;
+        }
+// configuring clock and misc register for PWM feature
+        rx_tx_buf[0] = 0x1E;
+        if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
+        {
+                if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
+                {
+                        rx_tx_buf[1] |= (1 << 6);
+                        rx_tx_buf[1] |= ~(1 << 5);
+                        if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
+                        {
+                                return -1;
+                        }
+                }
+        }
+        else
+        {
+                return -1;
+        }
+
+        rx_tx_buf[0] = 0x1F;
+        if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
+        {
+                if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
+                {
+                        rx_tx_buf[1] &= ~(1 << 7);
+                        rx_tx_buf[1] &= ~(1 << 3);
+                        rx_tx_buf[1] &= ~((0x7) << 4);
+                        rx_tx_buf[1] |= ((1 & 0x7) << 4);
+                        if(write(_fd, &(rx_tx_buf[0]), 2) == 2)
+                        {
+                                return 0;
+                        }
+                }
+        }
+
+        return -1;
+}
+
+//configuring extra registers as pwm for extended gpio
+static int sx150x_pwm_init(int pin)
+{
+        int i;
+        int add = (pin < 8) ? 1 : 0;
+
+        unsigned char rx_tx_buf[] = {0x0 + add, 0, 0x6 + add, 0, 0xE + add, 0, 0x20 + add, 0, 0x10 + add, 0};
+
+        if(_fd == -1)
+        {
+                return -1;
+        }
+
+        for(i = 0; i < 9; i += 2)
+        {
+                if(write(_fd, &(rx_tx_buf[i]), 1) != 1)
+                {
+                        return -1;
+                }
+                if(read(_fd, &(rx_tx_buf[i + 1]), 1) != 1)
+                {
+                        return -1;
+                }
+
+                if((i == 2) || (i == 6))
+                        rx_tx_buf[i+1] |= (1 << (pin % 8));
+                else
+                        rx_tx_buf[i+1]  &= ~(1 << (pin % 8));
+
+                if(write(_fd, &(rx_tx_buf[i]), 2) != 2)
+                {
+                        return -1;
+                }
+        }
+
+        return 0;
+}
 
 // utility function to setup pin mapping of boards
 static mraa_result_t mraa_roscube_set_pininfo(mraa_board_t* board, int mraa_index, char* name,
@@ -138,13 +467,20 @@ mraa_board_t* mraa_roscube_pico_nx()
     // We fix the base currently.
     base1 = 231;
 
-    syslog(LOG_NOTICE, "ROSCubeX: base1 %d base2 %d\n", base1);
+    syslog(LOG_NOTICE, "ROSCube Pico NX: base1 %d \n", base1);
 
     // Configure PWM
     b->pwm_dev_count = 5;
     b->pwm_default_period = 5000;
     b->pwm_max_period = 660066006;
     b->pwm_min_period = 1;
+
+    // initializations of pwm functions
+    b->adv_func->pwm_init_raw_replace = pwm_init_raw_replace;
+    b->adv_func->pwm_period_replace = pwm_period_replace;
+    b->adv_func->pwm_read_replace = pwm_read_replace;
+    b->adv_func->pwm_write_replace = pwm_write_replace;
+    b->adv_func->pwm_enable_replace = pwm_enable_replace;
 
     mraa_roscube_set_pininfo(b, 1,  "5V",               (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 2,  "GND",              (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
