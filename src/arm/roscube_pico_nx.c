@@ -191,7 +191,7 @@ mraa_board_t* mraa_roscube_pico_nx()
 
     // Configure SPI
     b->spi_bus_count = 0;
-    b->spi_bus[b->spi_bus_count].bus_id = 1;
+    b->spi_bus[b->spi_bus_count].bus_id = 0;
     b->spi_bus[b->spi_bus_count].slave_s = 0;
     mraa_roscube_get_pin_index(b, "SPI0_CS0",  &(b->spi_bus[b->spi_bus_count].cs));
     mraa_roscube_get_pin_index(b, "MOSI0", &(b->spi_bus[b->spi_bus_count].mosi));
@@ -199,7 +199,7 @@ mraa_board_t* mraa_roscube_pico_nx()
     mraa_roscube_get_pin_index(b, "SPI_CLK",  &(b->spi_bus[b->spi_bus_count].sclk));
     b->spi_bus_count++;
 
-    b->spi_bus[b->spi_bus_count].bus_id = 1;
+    b->spi_bus[b->spi_bus_count].bus_id = 0;
     b->spi_bus[b->spi_bus_count].slave_s = 1;
     mraa_roscube_get_pin_index(b, "SPI0_CS1",  &(b->spi_bus[b->spi_bus_count].cs));
     mraa_roscube_get_pin_index(b, "MOSI0", &(b->spi_bus[b->spi_bus_count].mosi));
