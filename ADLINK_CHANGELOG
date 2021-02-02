@@ -1,14 +1,11 @@
 
 Changelog for Neuron Library
 ============================
-<<<<<<< HEAD
 
 v1.3.2
 -------------------
 1. Support ROScube Pico (exclude PWM & SPI).
 2. Able to control peripheral without root privilege.
-=======
->>>>>>> edabcba6be83853e1703ef4ed53ee0e1ce8f9997
 
 v1.3.1
 -------------------
