@@ -160,54 +160,12 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 	char buffer[100] = {0};
 	int i, fd;
 	syslog(LOG_WARNING, "pwm_init: pwm%i. chip info %d.", pin, dev->chipid);
-
-	//if(dev->chipid == 1 || dev->chipid == 2)
-	//{
-	//	dev->advance_func->pwm_period_replace = NULL;
-	//	dev->advance_func->pwm_read_replace = NULL;
-	//	dev->advance_func->pwm_write_replace = NULL;
-	//	dev->advance_func->pwm_enable_replace = NULL;
-//
-	//	char directory[MAX_SIZE];
-	//	snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
-	//	struct stat dir;
-	//	if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
-	//		syslog(LOG_NOTICE, "pwm_init: pwm%i already exported, continuing", pin);
-	//		dev->owner = 0; // Not Owner
-	//	} else {
-	//		char buffer[MAX_SIZE];
-	//		snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
-	//		int export_f = open(buffer, O_WRONLY);
-	//		if (export_f == -1) {
-	//			syslog(LOG_ERR, "pwm_init: pwm%i. Failed to open export for writing: %s", pin, strerror(errno));
-	//			free(dev);
-	//			return MRAA_ERROR_INVALID_RESOURCE;
-	//		}
-//
-	//		char out[MAX_SIZE];
-	//		int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
-	//		if (write(export_f, out, size * sizeof(char)) == -1) {
-	//			syslog(LOG_WARNING, "pwm_init: pwm%i. Failed to write to export! (%s) Potentially already in use.", pin, strerror(errno));
-	//			close(export_f);
-	//			free(dev);
-	//			return MRAA_ERROR_INVALID_RESOURCE;
-	//		}
-	//		dev->owner = 1;
-	//		mraa_pwm_period_us(dev, 0xFF);
-	//		close(export_f);
-	//	}
-//
-	//	mraa_pwm_setup_duty_fp(dev);
-//
-	//	return MRAA_SUCCESS;
-	//}else if(dev->chipid == 3)
-	//{
 	dev->advance_func->pwm_period_replace = pwm_period_replace;
 	dev->advance_func->pwm_read_replace = pwm_read_replace;
 	dev->advance_func->pwm_write_replace = pwm_write_replace;
 	dev->advance_func->pwm_enable_replace = pwm_enable_replace;
 
-	if(pin < 5)
+	if(pin > 2 && pin < 8 )
 	{
 		if(sx150x_pwm_init(pin))
 		{
@@ -472,7 +430,7 @@ mraa_board_t* mraa_roscube_pico_nx()
     // Configure PWM
     b->pwm_dev_count = 5;
     b->pwm_default_period = 5000;
-    b->pwm_max_period = 660066006;
+    b->pwm_max_period = 6600000;
     b->pwm_min_period = 1;
 
     // initializations of pwm functions
