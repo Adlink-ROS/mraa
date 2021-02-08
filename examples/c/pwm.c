@@ -18,7 +18,7 @@
 #include "mraa/pwm.h"
 
 /* PWM declaration */
-#define PWM 35
+#define PWM 25
 
 /* PWM period in us */
 #define PWM_FREQ 200
@@ -41,7 +41,8 @@ main(void)
     mraa_pwm_context pwm;
     float value = 0.0f;
     float output;
-
+    /* install signal handler */
+    signal(SIGINT, sig_handler);
     /* initialize mraa for the platform (not needed most of the times) */
     mraa_init();
 
@@ -53,13 +54,12 @@ main(void)
         return EXIT_FAILURE;
     }
 
-#if 0  // ROScube-I doesn't support PWM period setting.
+    // ROScube-I doesn't support PWM period setting.
     /* set PWM period */
     status = mraa_pwm_period_us(pwm, PWM_FREQ);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
-#endif
 
     /* enable PWM */
     status = mraa_pwm_enable(pwm, 1);
@@ -86,7 +86,7 @@ main(void)
         output = mraa_pwm_read(pwm);
         fprintf(stdout, "PWM value is %f\n", output);
     }
-
+    printf("Close\n");
     /* close PWM */
     mraa_pwm_close(pwm);
 
