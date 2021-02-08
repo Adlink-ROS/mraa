@@ -20,8 +20,8 @@
 #include "mraa/gpio.h"
 
 /* gpio declaration */
-#define GPIO_PIN_1 25
-#define GPIO_PIN_2 26
+#define GPIO_PIN_1 7
+#define GPIO_PIN_2 8
 
 volatile sig_atomic_t flag = 1;
 

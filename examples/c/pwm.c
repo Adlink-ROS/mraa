@@ -18,7 +18,7 @@
 #include "mraa/pwm.h"
 
 /* PWM declaration */
-#define PWM 25
+#define PWM 35
 
 /* PWM period in us */
 #define PWM_FREQ 200

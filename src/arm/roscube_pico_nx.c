@@ -37,34 +37,21 @@
 
 #define PLATFORM_NAME "ROSCUBE-PICO-NX"
 
-#define MRAA_ROSCUBE_PICO_NX_GPIOCOUNT 4
-#define MRAA_ROSCUBE_PICO_NX_UARTCOUNT 1
+#define MRAA_ROSCUBE_GPIOCOUNT 5
+#define MRAA_ROSCUBE_UARTCOUNT 1
 
 #define MAX_SIZE 64
 #define POLL_TIMEOUT
 static volatile int base1,_fd;
 static mraa_gpio_context gpio;
-static char* uart_name[MRAA_ROSCUBE_PICO_NX_UARTCOUNT] = {"COM1" };
-static char* uart_path[MRAA_ROSCUBE_PICO_NX_UARTCOUNT] = {"/dev/ttyTHS1"};
+static char* uart_name[MRAA_ROSCUBE_UARTCOUNT] = {"COM1" };
+static char* uart_path[MRAA_ROSCUBE_UARTCOUNT] = {"/dev/ttyTHS1"};
 static unsigned char regIon[4]   = {0x33,0x36,0x3B,0x40};
 
 static unsigned int  IonValue[4]   = {0xFF, 0xFF, 0xFF, 0xFF};
 
 //pwm replace function for sm1509 
 static int sx150x_pwm_init(int);
-//
-//static int
-//mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
-//{
-//    char bu[MAX_SIZE];
-//    snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
-//
-//    dev->duty_fp = open(bu, O_RDWR);
-//    if (dev->duty_fp == -1) {
-//        return 1;
-//    }
-//    return 0;
-//}
 
 int _tperiod;
 
@@ -76,25 +63,25 @@ static mraa_result_t pwm_period_replace(mraa_pwm_context dev, int period)
 
 static float pwm_read_replace(mraa_pwm_context dev)
 {
-        unsigned char rx_tx_buf[3] = {0};
+    unsigned char rx_tx_buf[3] = {0};
 
-        if(dev->pin < 9)
+    if(dev->pin < 9)
+    {
+        if(_fd == -1)
         {
-                if(_fd == -1)
-                {
-                        return 0;
-                }
-
-                rx_tx_buf[0] = regIon[dev->pin-3];
-                if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
-                {
-                        if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
-                        {
-                                return (rx_tx_buf[1] / 2.55);
-                        }
-                }
+            return 0;
         }
-        return 0;
+
+        rx_tx_buf[0] = regIon[dev->pin-3];
+        if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
+        {
+            if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
+            {
+                return (rx_tx_buf[1] / 2.55);
+            }
+        }
+    }
+    return 0;
 }
 
 static mraa_result_t pwm_write_replace(mraa_pwm_context dev, float duty)
@@ -105,19 +92,19 @@ static mraa_result_t pwm_write_replace(mraa_pwm_context dev, float duty)
  
         if(dev->pin < 9)
         {
-                if(_fd == -1)
-                {
-                        return MRAA_ERROR_INVALID_RESOURCE;
-                }
+            if(_fd == -1)
+            {
+                return MRAA_ERROR_INVALID_RESOURCE;
+            }
 
-                rx_tx_buf[0] = regIon[dev->pin-3];
-                rx_tx_buf[1] = IonValue[dev->pin-3];
+            rx_tx_buf[0] = regIon[dev->pin-3];
+            rx_tx_buf[1] = IonValue[dev->pin-3];
 
-                if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
-                {
-                        return MRAA_ERROR_NO_RESOURCES;
-                }
-                return MRAA_SUCCESS;
+            if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
+            {
+                return MRAA_ERROR_NO_RESOURCES;
+            }
+            return MRAA_SUCCESS;
         }
         return MRAA_ERROR_NO_RESOURCES;
 }
@@ -129,6 +116,7 @@ static mraa_result_t pwm_enable_replace(mraa_pwm_context dev, int enable)
     if(pin < 7 && pin > 2){
         unsigned char rx_tx_buf[3] = {0};
         if (enable==0){
+            //If enable is 0, the EEPROM of the SX1509 will be reset to default.
             if(_fd != -1)
             {
                 unsigned char rx_tx_buf_disable[3] = {0};
@@ -175,7 +163,6 @@ static mraa_result_t pwm_enable_replace(mraa_pwm_context dev, int enable)
                 return MRAA_SUCCESS;
         }
     }
-
     return MRAA_ERROR_NO_RESOURCES;
 }
 
@@ -193,7 +180,7 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 	{
 		if(sx150x_pwm_init(pin))
 		{
-				return MRAA_ERROR_NO_RESOURCES;
+			return MRAA_ERROR_NO_RESOURCES;
 		}
 		if((fd = open("/sys/class/gpio/unexport", O_WRONLY)) != -1)
 		{
@@ -234,10 +221,10 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 }
 static int sx150x_init()
 {
-        char rx_tx_buf[100] = {0};
+    char rx_tx_buf[100] = {0};
 	int i, bus_num, fd;
 
-        for(i = 0; i < 999; i++)
+    for(i = 0; i < 999; i++)
 	{
 		sprintf(rx_tx_buf,"/sys/class/gpio/gpiochip%d/device/name",i);
 		if((fd = open(rx_tx_buf, O_RDONLY)) != -1)
@@ -273,90 +260,87 @@ static int sx150x_init()
 		}
 	}
 
-        sprintf(rx_tx_buf, "/dev/i2c-%d",bus_num);
-        if((_fd = open(rx_tx_buf, O_RDWR)) < 0)
-        {
-                return -1;
-        }
-
-        if(ioctl(_fd, I2C_SLAVE_FORCE, 0x70) < 0)
-        {
-                return -1;
-        }
-// configuring clock and misc register for PWM feature
-        rx_tx_buf[0] = 0x1E;
-        if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
-        {
-                if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
-                {
-                        rx_tx_buf[1] |= (1 << 6);
-                        rx_tx_buf[1] |= ~(1 << 5);
-                        if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
-                        {
-                                return -1;
-                        }
-                }
-        }
-        else
-        {
-                return -1;
-        }
-
-        rx_tx_buf[0] = 0x1F;
-        if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
-        {
-                if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
-                {
-                        rx_tx_buf[1] &= ~(1 << 7);
-                        rx_tx_buf[1] &= ~(1 << 3);
-                        rx_tx_buf[1] &= ~((0x7) << 4);
-                        rx_tx_buf[1] |= ((1 & 0x7) << 4);
-                        if(write(_fd, &(rx_tx_buf[0]), 2) == 2)
-                        {
-                                return 0;
-                        }
-                }
-        }
-
+    sprintf(rx_tx_buf, "/dev/i2c-%d",bus_num);
+    if((_fd = open(rx_tx_buf, O_RDWR)) < 0)
+    {
         return -1;
+    }
+
+    if(ioctl(_fd, I2C_SLAVE_FORCE, 0x70) < 0)
+    {
+        return -1;
+    }
+// configuring clock and misc register for PWM feature
+    rx_tx_buf[0] = 0x1E;
+    if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
+    {
+        if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
+        {
+            rx_tx_buf[1] |= (1 << 6);
+            rx_tx_buf[1] |= ~(1 << 5);
+            if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
+            {
+                return -1;
+            }
+        }
+    }
+    else
+    {
+            return -1;
+    }
+
+    rx_tx_buf[0] = 0x1F;
+    if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
+    {
+        if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
+        {
+            rx_tx_buf[1] &= ~(1 << 7);
+            rx_tx_buf[1] &= ~(1 << 3);
+            rx_tx_buf[1] &= ~((0x7) << 4);
+            rx_tx_buf[1] |= ((1 & 0x7) << 4);
+            if(write(_fd, &(rx_tx_buf[0]), 2) == 2)
+            {
+                return 0;
+            }
+        }
+    }
+
+    return -1;
 }
 
 //configuring extra registers as pwm for extended gpio
 static int sx150x_pwm_init(int pin)
 {
-        int i;
-        int add = (pin < 8) ? 1 : 0;
+    int i;
+    int add = (pin < 8) ? 1 : 0;
 
-        unsigned char rx_tx_buf[] = {0x0 + add, 0, 0x6 + add, 0, 0xE + add, 0, 0x20 + add, 0, 0x10 + add, 0};
+    unsigned char rx_tx_buf[] = {0x0 + add, 0, 0x6 + add, 0, 0xE + add, 0, 0x20 + add, 0, 0x10 + add, 0};
 
-        if(_fd == -1)
+    if(_fd == -1)
+    {
+        return -1;
+    }
+
+    for(i = 0; i < 9; i += 2)
+    {
+        if(write(_fd, &(rx_tx_buf[i]), 1) != 1)
         {
-                return -1;
+            return -1;
         }
-
-        for(i = 0; i < 9; i += 2)
+        if(read(_fd, &(rx_tx_buf[i + 1]), 1) != 1)
         {
-                if(write(_fd, &(rx_tx_buf[i]), 1) != 1)
-                {
-                        return -1;
-                }
-                if(read(_fd, &(rx_tx_buf[i + 1]), 1) != 1)
-                {
-                        return -1;
-                }
-
-                if((i == 2) || (i == 6))
-                        rx_tx_buf[i+1] |= (1 << (pin % 8));
-                else
-                        rx_tx_buf[i+1]  &= ~(1 << (pin % 8));
-
-                if(write(_fd, &(rx_tx_buf[i]), 2) != 2)
-                {
-                        return -1;
-                }
+            return -1;
         }
-
-        return 0;
+        if((i == 2) || (i == 6))
+            rx_tx_buf[i+1] |= (1 << (pin % 8));
+        else
+            rx_tx_buf[i+1]  &= ~(1 << (pin % 8));
+        if(write(_fd, &(rx_tx_buf[i]), 2) != 2)
+        {
+            return -1;
+        }
+    }
+    return 0;
 }
 
 // utility function to setup pin mapping of boards
@@ -407,7 +391,7 @@ static mraa_result_t mraa_roscube_get_pin_index(mraa_board_t* board, char* name,
 
 static mraa_result_t mraa_roscube_init_uart(mraa_board_t* board, int index)
 {
-    if (index >= MRAA_ROSCUBE_PICO_NX_UARTCOUNT)
+    if (index >= MRAA_ROSCUBE_UARTCOUNT)
         return MRAA_ERROR_INVALID_RESOURCE;
     board->uart_dev[index].index = index;
     board->uart_dev[index].device_path = uart_path[index];
@@ -433,7 +417,7 @@ mraa_board_t* mraa_roscube_pico_nx()
     }
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_ROSCUBE_PICO_NX_PINCOUNT;
-    b->gpio_count = MRAA_ROSCUBE_PICO_NX_GPIOCOUNT;
+    b->gpio_count = MRAA_ROSCUBE_GPIOCOUNT;
     b->chardev_capable = 0;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_ROSCUBE_PICO_NX_PINCOUNT);
@@ -507,8 +491,8 @@ mraa_board_t* mraa_roscube_pico_nx()
     mraa_roscube_set_pininfo(b, 36, "I2C1_SDA",         (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, -1);
     mraa_roscube_set_pininfo(b, 37, "3.3V",             (mraa_pincapabilities_t){ -1, 0, 0, 0, 0, 0, 0, 0 }, -1);
    
-    b->uart_dev_count = MRAA_ROSCUBE_PICO_NX_UARTCOUNT;
-    for (int i = 0; i < MRAA_ROSCUBE_PICO_NX_UARTCOUNT; i++)
+    b->uart_dev_count = MRAA_ROSCUBE_UARTCOUNT;
+    for (int i = 0; i < MRAA_ROSCUBE_UARTCOUNT; i++)
         mraa_roscube_init_uart(b, i);
     b->def_uart_dev = 0;
 
