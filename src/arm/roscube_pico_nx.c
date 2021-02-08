@@ -443,7 +443,7 @@ mraa_board_t* mraa_roscube_pico_nx()
     // Configure PWM
     b->pwm_dev_count = 4;
     b->pwm_default_period = 5000;
-    b->pwm_max_period = 6600000;
+    b->pwm_max_period = 2147483;
     b->pwm_min_period = 1;
 
     // initializations of pwm functions
