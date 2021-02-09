@@ -27,13 +27,13 @@ ADLINK ROScube-Pico-NX ARM
 |                              |       V5       |      19     |     20      |      GND       |                              |
 |                              |     CAN_L      |      21     |     22      |     CAN_H      |                              |
 |                              |      GND       |      23     |     24      |      GPIO7     |             238              |
-|             237              |      GPIO6     |      25     |     26      |      GPIO5     |             236              |
-|             235              |      GPIO4     |      27     |     28      |      GPIO3     |             234              |
+|             237              |   GPIO6_PWM    |      25     |     26      |   GPIO5_PWM    |             236              |
+|             235              |   GPIO4_PWM    |      27     |     28      |   GPIO3_PWM    |             234              |
 |                              |      GND       |      29     |     30      |     SPI_CLK    |                              |
 |                              |     MISO0      |      31     |     32      |      MOSI0     |                              |
 |                              |     GPIO19     |      33     |     34      |      GND       |                              |
 |                              |    I2C1_SCL    |      35     |     36      |    I2C1_SDA    |                              |
-|                              |      3v3       |      37     |             |                |                              |
+|                              |      3v3       |      37     |
 
 
 ## Serial    port mapping
