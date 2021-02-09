@@ -113,9 +113,11 @@ static mraa_result_t pwm_write_replace(mraa_pwm_context dev, float duty)
 static mraa_result_t pwm_enable_replace(mraa_pwm_context dev, int enable)
 {
     int pin = dev->pin;
-    if(pin < 7 && pin > 2){
+    if(pin < 7 && pin > 2)
+    {
         unsigned char rx_tx_buf[3] = {0};
-        if (enable==0){
+        if (enable==0)
+        {
             //If enable is 0, the EEPROM of the SX1509 will be reset to default.
             if(_fd != -1)
             {
@@ -142,7 +144,8 @@ static mraa_result_t pwm_enable_replace(mraa_pwm_context dev, int enable)
             }
                 return MRAA_SUCCESS;
         }
-        else{
+        else
+        {
             if(_fd != -1)
             {
                 if(_fd == -1)
@@ -216,14 +219,12 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 	{
 		return MRAA_ERROR_NO_RESOURCES;
 	}
-	//}
 	return MRAA_ERROR_NO_RESOURCES;
 }
 static int sx150x_init()
 {
     char rx_tx_buf[100] = {0};
 	int i, bus_num, fd;
-
     for(i = 0; i < 999; i++)
 	{
 		sprintf(rx_tx_buf,"/sys/class/gpio/gpiochip%d/device/name",i);
@@ -313,14 +314,12 @@ static int sx150x_pwm_init(int pin)
 {
     int i;
     int add = (pin < 8) ? 1 : 0;
-
     unsigned char rx_tx_buf[] = {0x0 + add, 0, 0x6 + add, 0, 0xE + add, 0, 0x20 + add, 0, 0x10 + add, 0};
 
     if(_fd == -1)
     {
         return -1;
     }
-
     for(i = 0; i < 9; i += 2)
     {
         if(write(_fd, &(rx_tx_buf[i]), 1) != 1)
@@ -347,25 +346,31 @@ static int sx150x_pwm_init(int pin)
 static mraa_result_t mraa_roscube_set_pininfo(mraa_board_t* board, int mraa_index, char* name,
                                               mraa_pincapabilities_t caps, int sysfs_pin)
 {
-    if (mraa_index < board->phy_pin_count) {
+    if (mraa_index < board->phy_pin_count) 
+    {
         mraa_pininfo_t* pin_info = &board->pins[mraa_index];
         strncpy(pin_info->name, name, MRAA_PIN_NAME_SIZE);
         pin_info->capabilities = caps;
-        if (caps.gpio) {
+        if (caps.gpio) 
+        {
             pin_info->gpio.pinmap = sysfs_pin;
             pin_info->gpio.mux_total = 0;
         }
-        if (caps.i2c) {
+        if (caps.i2c) 
+        {
             pin_info->i2c.pinmap = 1;
             pin_info->i2c.mux_total = 0;
         }
-        if (caps.uart) {
+        if (caps.uart) 
+        {
             pin_info->uart.mux_total = 0;
         }
-        if (caps.spi) {
+        if (caps.spi) 
+        {
             pin_info->spi.mux_total = 0;
         }
-        if (caps.pwm) {
+        if (caps.pwm) 
+        {
             pin_info->pwm.mux_total = 0;
             pin_info->pwm.parent_id = 0;
             pin_info->pwm.pinmap = sysfs_pin - base1;
@@ -377,8 +382,10 @@ static mraa_result_t mraa_roscube_set_pininfo(mraa_board_t* board, int mraa_inde
 
 static mraa_result_t mraa_roscube_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
 {
-    for (int i = 0; i < board->phy_pin_count; ++i) {
-        if (strncmp(name, board->pins[i].name, MRAA_PIN_NAME_SIZE) == 0) {
+    for (int i = 0; i < board->phy_pin_count; ++i) 
+    {
+        if (strncmp(name, board->pins[i].name, MRAA_PIN_NAME_SIZE) == 0) 
+        {
             *pin_index = i;
             return MRAA_SUCCESS;
         }
@@ -412,7 +419,8 @@ mraa_board_t* mraa_roscube_pico_nx()
 
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof (mraa_board_t));
 
-    if (b == NULL) {
+    if (b == NULL) 
+    {
         return NULL;
     }
     b->platform_name = PLATFORM_NAME;
@@ -421,12 +429,14 @@ mraa_board_t* mraa_roscube_pico_nx()
     b->chardev_capable = 0;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_ROSCUBE_PICO_NX_PINCOUNT);
-    if (b->pins == NULL) {
+    if (b->pins == NULL) 
+    {
         goto error;
     }
 
     b->adv_func = (mraa_adv_func_t *) calloc(1, sizeof (mraa_adv_func_t));
-    if (b->adv_func == NULL) {
+    if (b->adv_func == NULL) 
+    {
         free(b->pins);
         goto error;
     }
@@ -519,7 +529,8 @@ mraa_board_t* mraa_roscube_pico_nx()
     b->def_i2c_bus = 1;
 
     i2c_bus_num = mraa_find_i2c_bus("c240000.i2c",0);
-    if (i2c_bus_num != -1) {
+    if (i2c_bus_num != -1) 
+    {
         b->i2c_bus[0].bus_id = i2c_bus_num;
         mraa_roscube_get_pin_index(b, "I2C0_SDA", (int*) &(b->i2c_bus[0].sda));
         mraa_roscube_get_pin_index(b, "I2C0_SCL", (int*) &(b->i2c_bus[0].scl));
@@ -527,7 +538,8 @@ mraa_board_t* mraa_roscube_pico_nx()
     }
 
     i2c_bus_num = mraa_find_i2c_bus("31e0000.i2c",0);
-    if (i2c_bus_num != -1) {
+    if (i2c_bus_num != -1) 
+    {
         b->i2c_bus[1].bus_id = i2c_bus_num;
         mraa_roscube_get_pin_index(b, "I2C1_SDA", (int*) &(b->i2c_bus[1].sda));
         mraa_roscube_get_pin_index(b, "I2C1_SCL", (int*) &(b->i2c_bus[1].scl));

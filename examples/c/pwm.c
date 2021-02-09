@@ -54,7 +54,6 @@ main(void)
         return EXIT_FAILURE;
     }
 
-    // ROScube-I doesn't support PWM period setting.
     /* set PWM period */
     status = mraa_pwm_period_us(pwm, PWM_FREQ);
     if (status != MRAA_SUCCESS) {
