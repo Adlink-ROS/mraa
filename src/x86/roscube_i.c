@@ -116,57 +116,75 @@ int index_mapping(int index)
 }
 void rqi_led_init (int index)
 {
-    FILE* export_file;
-    FILE* led_dir_file;
+    //FILE* export_file;
     char  export_path[64];
+    char export_val[64];
     char led_path_dir[64];
+    char led_setup_val[64];
 
     index = index_mapping(index);
     snprintf(export_path,64,SYSFS_CLASS_GPIO "/export");
-    export_file = fopen(export_path, "w");
-    fprintf(export_file, "%d",index);
-    fclose(export_file);
+    int export_file = open(export_path, O_RDWR);
+    int length_export = snprintf(export_val, sizeof(export_val), "%d", index);
+    write(export_file, export_val, length_export * sizeof(char));
+    close(export_file);
 
     snprintf(led_path_dir,64,SYSFS_CLASS_GPIO "/gpio%d/direction",index);
-    led_dir_file = fopen(led_path_dir, "w");
-    fprintf(led_dir_file, "%s","out");
-    fclose(led_dir_file);
+    int led_dir_file = open(led_path_dir, O_RDWR);
+    int length_dir = snprintf(led_setup_val, sizeof(led_setup_val), "out");
+    write(led_dir_file, led_setup_val, length_dir * sizeof(char));
+    close(led_dir_file);
+
 }
 
 mraa_result_t rqi_led_set_bright (int index, int val)
 {
-    FILE* led_val_file;
+    //FILE* led_val_file;
     char led_path_val[64];
+    char led_setup_val[64];
     index = index_mapping(index);
     snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%d/value",index);
-    led_val_file = fopen(led_path_val, "w");
-    fprintf(led_val_file,"%d",val);
-    fclose(led_val_file);
+    int led_dir_file = open(led_path_val, O_RDWR);
+    int length = snprintf(led_setup_val, sizeof(led_setup_val), "%d", val);
+    write(led_dir_file, led_setup_val, length * sizeof(char));
+    close(led_dir_file);
     return MRAA_SUCCESS;
 }
 
 mraa_result_t rqi_led_set_close(int index)
 {
-    FILE* unexport_file;
+    //FILE* unexport_file;
     char  unexport_path[64];
+    char unexport_val[64];
     index = index_mapping(index);
     snprintf(unexport_path,64,SYSFS_CLASS_GPIO "/unexport");
-    unexport_file = fopen(unexport_path, "w");
-    fprintf(unexport_file,"%d",index);
-    fclose(unexport_file);
+    //unexport_file = fopen(unexport_path, "w");
+    //fprintf(unexport_file,"%d",index);
+    //fclose(unexport_file);
+    int unexport_file = open(unexport_path, O_RDWR);
+    int length_unexport = snprintf(unexport_val, sizeof(unexport_val), "%d", index);
+    write(unexport_file, unexport_val, length_unexport * sizeof(char));
+    close(unexport_file);
+
     return MRAA_SUCCESS;
 }
 
 int rqi_led_check_bright (int index)
 {
-    FILE* led_val_file;
+    //FILE* led_val_file;
     char led_path_val[64];
     char buf[64];
     index = index_mapping(index);
+    //int read_val;
     snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%i/value",index);
-    led_val_file = fopen(led_path_val, "r");
-    fscanf(led_val_file,"%s",buf);
-    fclose(led_val_file);
+    //led_val_file = fopen(led_path_val, "r");
+    //fscanf(led_val_file,"%s",buf);
+    //fclose(led_val_file);
+    int led_val_file = open(led_path_val, O_RDWR);
+    //int length_unexport = snprintf(unexport_val, sizeof(unexport_val), "%d", index);
+    read(buf, led_val_file, 64 * sizeof(char));
+    close(led_val_file);
+    lseek(buf, 0, 0);
     return atoi(buf);
 }
 
@@ -272,25 +290,6 @@ mraa_board_t* mraa_roscube_i()
     for (int i = 0; i < MRAA_ROSCUBE_UARTCOUNT; i++)
         mraa_roscube_init_uart(b, i);
     b->def_uart_dev = 0;
-    #if 0
-    // Configure SPI #0 CS1
-    b->spi_bus_count = 0;
-    b->spi_bus[b->spi_bus_count].bus_id = 1;
-    b->spi_bus[b->spi_bus_count].slave_s = 0;
-    mraa_roscube_get_pin_index(b, "SPI_0_CE0",  &(b->spi_bus[b->spi_bus_count].cs));
-    mraa_roscube_get_pin_index(b, "SPI_0_MOSI", &(b->spi_bus[b->spi_bus_count].mosi));
-    mraa_roscube_get_pin_index(b, "SPI_0_MISO", &(b->spi_bus[b->spi_bus_count].miso));
-    mraa_roscube_get_pin_index(b, "SPI_0_SCLK",  &(b->spi_bus[b->spi_bus_count].sclk));
-    b->spi_bus_count++;
-
-    b->spi_bus[b->spi_bus_count].bus_id = 1;
-    b->spi_bus[b->spi_bus_count].slave_s = 1;
-    mraa_roscube_get_pin_index(b, "SPI_0_CE1",  &(b->spi_bus[b->spi_bus_count].cs));
-    mraa_roscube_get_pin_index(b, "SPI_0_MOSI", &(b->spi_bus[b->spi_bus_count].mosi));
-    mraa_roscube_get_pin_index(b, "SPI_0_MISO", &(b->spi_bus[b->spi_bus_count].miso));
-    mraa_roscube_get_pin_index(b, "SPI_0_SCLK",  &(b->spi_bus[b->spi_bus_count].sclk));
-    b->spi_bus_count++;
-    #endif
     // Set number of i2c adaptors usable from userspace
     b->i2c_bus_count = 0;
     b->def_i2c_bus = 0;
