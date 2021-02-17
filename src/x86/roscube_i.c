@@ -116,7 +116,6 @@ int index_mapping(int index)
 }
 void rqi_led_init (int index)
 {
-    //FILE* export_file;
     char  export_path[64];
     char export_val[64];
     char led_path_dir[64];
@@ -139,7 +138,6 @@ void rqi_led_init (int index)
 
 mraa_result_t rqi_led_set_bright (int index, int val)
 {
-    //FILE* led_val_file;
     char led_path_val[64];
     char led_setup_val[64];
     index = index_mapping(index);
@@ -153,14 +151,10 @@ mraa_result_t rqi_led_set_bright (int index, int val)
 
 mraa_result_t rqi_led_set_close(int index)
 {
-    //FILE* unexport_file;
     char  unexport_path[64];
     char unexport_val[64];
     index = index_mapping(index);
-    snprintf(unexport_path,64,SYSFS_CLASS_GPIO "/unexport");
-    //unexport_file = fopen(unexport_path, "w");
-    //fprintf(unexport_file,"%d",index);
-    //fclose(unexport_file);
+    snprintf(unexport_path,64,SYSFS_CLASS_GPIO "/unexport");    //int length_unexport = snprintf(unexport_val, sizeof(unexport_val), "%d", index);
     int unexport_file = open(unexport_path, O_RDWR);
     int length_unexport = snprintf(unexport_val, sizeof(unexport_val), "%d", index);
     write(unexport_file, unexport_val, length_unexport * sizeof(char));
@@ -171,17 +165,11 @@ mraa_result_t rqi_led_set_close(int index)
 
 int rqi_led_check_bright (int index)
 {
-    //FILE* led_val_file;
     char led_path_val[64];
     char buf[64];
     index = index_mapping(index);
-    //int read_val;
     snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%i/value",index);
-    //led_val_file = fopen(led_path_val, "r");
-    //fscanf(led_val_file,"%s",buf);
-    //fclose(led_val_file);
     int led_val_file = open(led_path_val, O_RDWR);
-    //int length_unexport = snprintf(unexport_val, sizeof(unexport_val), "%d", index);
     read(buf, led_val_file, 64 * sizeof(char));
     close(led_val_file);
     lseek(buf, 0, 0);
