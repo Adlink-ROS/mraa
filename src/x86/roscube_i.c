@@ -146,7 +146,7 @@ mraa_result_t rqi_led_init(int index)
     return MRAA_SUCCESS;
 }
 
-mraa_result_t rqi_led_set_bright (int index, int val)
+mraa_result_t rqi_led_set_bright(int index, int val)
 {
     char led_path_val[64];
     char led_setup_val[64];
@@ -157,7 +157,7 @@ mraa_result_t rqi_led_set_bright (int index, int val)
         syslog(LOG_CRIT, "ROSCUBE I: rqi_led_set_bright unable to open GPIO value (errno %d)", errno);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
-    int length = snprintf(led_setup_val, sizeof(led_setup_val), "%d", val);
+    int length = snprintf(led_setup_val, sizeof(led_setup_val), "%d", (val)?0:1);
     if (write(led_dir_file, led_setup_val, length * sizeof(char)) == -1) {
         syslog(LOG_CRIT, "ROSCUBE I: rqi_led_set_bright unable to write GPIO value (errno %d)", errno);
         close(led_dir_file);
@@ -185,17 +185,22 @@ mraa_result_t rqi_led_set_close(int index)
     return MRAA_SUCCESS;
 }
 
-int rqi_led_check_bright (int index)
+mraa_result_t rqi_led_check_bright(int index, int *val)
 {
     char led_path_val[64];
     char buf[64];
     index = index_mapping(index);
     snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%i/value",index);
     int led_val_file = open(led_path_val, O_RDWR);
+    if (led_val_file == -1) {
+        syslog(LOG_CRIT, "ROSCUBE I: rqi_led_check_bright unable to open GPIO value");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     read(buf, led_val_file, 64 * sizeof(char));
     close(led_val_file);
     lseek(buf, 0, 0);
-    return atoi(buf);
+    *val = (atoi(buf) == 0)?1:0;
+    return MRAA_SUCCESS;
 }
 
 

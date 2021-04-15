@@ -280,10 +280,14 @@ mraa_led_read_brightness(mraa_led_context dev)
 {
     char buf[3];
 
-    if (IS_FUNC_DEFINED(dev, led_check_bright))
-    {
-        return plat->adv_func->led_check_bright(dev->index);
+    if (IS_FUNC_DEFINED(dev, led_check_bright)) {
+        int val;
+        if (plat->adv_func->led_check_bright(dev->index, &val) != MRAA_SUCCESS) {
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        return val;
     }
+
     if (dev == NULL) {
         syslog(LOG_ERR, "led: read_brightness: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
@@ -321,11 +325,11 @@ mraa_led_read_max_brightness(mraa_led_context dev)
 {
     char buf[3];
 
-    if (IS_FUNC_DEFINED(dev,led_init))
-    {
-        syslog(LOG_ERR, "led: read_brightness: context is invalid");
-        return MRAA_ERROR_INVALID_HANDLE;
+    if (IS_FUNC_DEFINED(dev, led_init)) {
+        syslog(LOG_ERR, "led: read_max_brightness: not support for this hardware");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
+
     if (dev == NULL) {
         syslog(LOG_ERR, "led: read_max_brightness: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;

@@ -108,5 +108,5 @@ typedef struct {
     mraa_result_t (*led_set_bright) (int index, int val);
     mraa_result_t (*led_set_close) (int index );
     mraa_result_t (*led_init) (int index);
-    int (*led_check_bright) (int index);
+    mraa_result_t (*led_check_bright) (int index, int *val);
 } mraa_adv_func_t;
