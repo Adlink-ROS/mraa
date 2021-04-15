@@ -114,7 +114,8 @@ int index_mapping(int index)
 {
     return index + led_base;
 }
-void rqi_led_init (int index)
+
+mraa_result_t rqi_led_init(int index)
 {
     char  export_path[64];
     char export_val[64];
@@ -123,17 +124,26 @@ void rqi_led_init (int index)
 
     index = index_mapping(index);
     snprintf(export_path,64,SYSFS_CLASS_GPIO "/export");
-    int export_file = open(export_path, O_RDWR);
+    int export_file = open(export_path, O_WRONLY);
+    if (export_file == -1) {
+        syslog(LOG_CRIT, "ROSCUBE I: rqi_led_init unable to open GPIO export (errno %d)", errno);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     int length_export = snprintf(export_val, sizeof(export_val), "%d", index);
     write(export_file, export_val, length_export * sizeof(char));
     close(export_file);
+    usleep(100000); // Sleep 100ms to make sure export is done.
 
     snprintf(led_path_dir,64,SYSFS_CLASS_GPIO "/gpio%d/direction",index);
     int led_dir_file = open(led_path_dir, O_RDWR);
+    if (led_dir_file == -1) {
+        syslog(LOG_CRIT, "ROSCUBE I: rqi_led_init unable to open GPIO direction (errno %d)", errno);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     int length_dir = snprintf(led_setup_val, sizeof(led_setup_val), "out");
     write(led_dir_file, led_setup_val, length_dir * sizeof(char));
     close(led_dir_file);
-
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t rqi_led_set_bright (int index, int val)
@@ -143,8 +153,16 @@ mraa_result_t rqi_led_set_bright (int index, int val)
     index = index_mapping(index);
     snprintf(led_path_val,64,SYSFS_CLASS_GPIO "/gpio%d/value",index);
     int led_dir_file = open(led_path_val, O_RDWR);
+    if (led_dir_file == -1) {
+        syslog(LOG_CRIT, "ROSCUBE I: rqi_led_set_bright unable to open GPIO value (errno %d)", errno);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     int length = snprintf(led_setup_val, sizeof(led_setup_val), "%d", val);
-    write(led_dir_file, led_setup_val, length * sizeof(char));
+    if (write(led_dir_file, led_setup_val, length * sizeof(char)) == -1) {
+        syslog(LOG_CRIT, "ROSCUBE I: rqi_led_set_bright unable to write GPIO value (errno %d)", errno);
+        close(led_dir_file);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     close(led_dir_file);
     return MRAA_SUCCESS;
 }
@@ -155,7 +173,11 @@ mraa_result_t rqi_led_set_close(int index)
     char unexport_val[64];
     index = index_mapping(index);
     snprintf(unexport_path,64,SYSFS_CLASS_GPIO "/unexport");    //int length_unexport = snprintf(unexport_val, sizeof(unexport_val), "%d", index);
-    int unexport_file = open(unexport_path, O_RDWR);
+    int unexport_file = open(unexport_path, O_WRONLY);
+    if (unexport_file == -1) {
+        syslog(LOG_CRIT, "ROSCUBE I: rqi_led_set_close unable to unexport GPIO");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     int length_unexport = snprintf(unexport_val, sizeof(unexport_val), "%d", index);
     write(unexport_file, unexport_val, length_unexport * sizeof(char));
     close(unexport_file);

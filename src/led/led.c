@@ -169,7 +169,11 @@ mraa_led_init(int index)
 
         dev->advance_func = plat->adv_func;
         dev->count = plat->led_dev_count;
-        plat->adv_func->led_init(index);
+        if (plat->adv_func->led_init(index) != MRAA_SUCCESS) {
+            syslog(LOG_CRIT, "led: init: Unable to call adv_func->led_init");
+            free(dev);
+            return NULL;
+        }
 
         return dev;
     }
@@ -457,8 +461,7 @@ mraa_led_close(mraa_led_context dev)
 {
     if (IS_FUNC_DEFINED(dev,led_set_close))
     {
-        plat->adv_func->led_set_close(dev->index);
-        return MRAA_SUCCESS;
+        return plat->adv_func->led_set_close(dev->index);
     }
 
     if (dev == NULL) {
