@@ -52,7 +52,7 @@ main(int argc, char *argv[])
     if (val >= 0) {
         fprintf(stdout, "maximum brightness value for LED is: %d\n", val);
     } else {
-        fprintf(stdout, "maximum brightness is not supported.");
+        fprintf(stdout, "maximum brightness is not supported.\n");
     }
 
     /* turn LED on/off depending on max_brightness value */
