@@ -18,25 +18,29 @@
 /* mraa header */
 #include "mraa/led.h"
 
-/* LED name */
-#define USER_LED 2
+/* LED default value */
+#define LED_NUM    0
+#define LED_ON_OFF 0
 
 /* trigger type */
 #define LED_TRIGGER "heartbeat"
 
 int
-main(void)
+main(int argc, char *argv[])
 {
     mraa_result_t status = MRAA_SUCCESS;
     mraa_led_context led;
-    int val;
+    int led_num, led_on_off;
+    led_num = (argc >= 2)?atoi(argv[1]):LED_NUM;
+    led_on_off = (argc >= 3)?atoi(argv[2]):LED_ON_OFF;
+    printf("Will set LED %d to %d\n", led_num, led_on_off);
     
     /* initialize mraa for the platform (not needed most of the time) */
     mraa_init();
  
     //! [Interesting]
     /* initialize LED */
-    led = mraa_led_init(USER_LED);
+    led = mraa_led_init(led_num);
     if (led == NULL) {
         fprintf(stderr, "Failed to initialize LED\n");
         mraa_deinit();
@@ -44,33 +48,30 @@ main(void)
     }
 
     /* read maximum brightness */
-    val = mraa_led_read_max_brightness(led);
-    fprintf(stdout, "maximum brightness value for LED is: %d\n", val);
-    if (val >= 1) {
-        val = 0;
+    int val = mraa_led_read_max_brightness(led);
+    if (val >= 0) {
+        fprintf(stdout, "maximum brightness value for LED is: %d\n", val);
     } else {
-        /* never reached mostly */
-        val = 1;
+        fprintf(stdout, "maximum brightness is not supported.");
     }
 
     /* turn LED on/off depending on max_brightness value */
-    status = mraa_led_set_brightness(led, val);
+    status = mraa_led_set_brightness(led, led_on_off);
     if (status != MRAA_SUCCESS) {
         fprintf(stderr, "unable to set LED brightness\n");
         goto err_exit;
     }
 
-    /* sleep for 5 seconds */
-    sleep(5);
+    /* sleep for 1 seconds */
+    sleep(1);
 
     /* set LED trigger to heartbeat */
     status = mraa_led_set_trigger(led, LED_TRIGGER);
-    if (status != MRAA_SUCCESS) {
+    if (status == MRAA_SUCCESS) {
+        fprintf(stdout, "LED trigger set to: heartbeat\n");
+    } else {
         fprintf(stderr, "unable to set LED trigger to: heartbeat\n");
-        goto err_exit;
     }
-
-    fprintf(stdout, "LED trigger set to: heartbeat\n");
 
     /* close LED */
     mraa_led_close(led);

@@ -327,7 +327,7 @@ mraa_led_read_max_brightness(mraa_led_context dev)
 
     if (IS_FUNC_DEFINED(dev, led_init)) {
         syslog(LOG_ERR, "led: read_max_brightness: not support for this hardware");
-        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+        return -1;
     }
 
     if (dev == NULL) {
