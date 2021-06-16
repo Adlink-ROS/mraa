@@ -30,52 +30,6 @@ mraa_arm_platform()
 {
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
     size_t len = 100;
-#if 0
-    char* line = malloc(len);
-    FILE* fh = fopen("/proc/cpuinfo", "r");
-
-    if (fh != NULL) {
-        while (getline(&line, &len, fh) != -1) {
-            if (strncmp(line, "Hardware", 8) == 0) {
-                if (strstr(line, "BCM2708")) {
-                    platform_type = MRAA_RASPBERRY_PI;
-                } else if (strstr(line, "BCM2709")) {
-                    platform_type = MRAA_RASPBERRY_PI;
-                } else if (strstr(line, "BCM2835")) {
-                    platform_type = MRAA_RASPBERRY_PI;
-                } else if (strstr(line, "Generic AM33XX")) {
-                    if(mraa_file_contains("/proc/device-tree/model", "phyBOARD-WEGA")) {
-                        platform_type = MRAA_PHYBOARD_WEGA;
-                    } else {
-                        platform_type = MRAA_BEAGLEBONE;
-                    }
-                } else if (strstr(line, "HiKey Development Board")) {
-                    platform_type = MRAA_96BOARDS;
-                } else if (strstr(line, "s900")) {
-                    platform_type = MRAA_96BOARDS;
-                } else if (strstr(line, "sun7i")) {
-                    if (mraa_file_contains("/proc/device-tree/model", "Banana Pro")) {
-                        platform_type = MRAA_BANANA;
-                    } else if (mraa_file_contains("/proc/device-tree/model",
-                                                  "Banana Pi")) {
-                        platform_type = MRAA_BANANA;
-                    }
-                    // For old kernels
-                    else if (mraa_file_exist("/sys/class/leds/green:ph24:led1")) {
-                        platform_type = MRAA_BANANA;
-                    }
-                } else if (strstr(line, "DE0/DE10-Nano-SoC")) {
-                        platform_type = MRAA_DE_NANO_SOC;
-                // For different kernel version(s) of DE10-Nano
-                } else if (strstr(line, "Altera SOCFPGA")) {
-                        platform_type = MRAA_DE_NANO_SOC;
-                }
-            }
-        }
-        fclose(fh);
-    }
-    free(line);
-#else
     FILE *fh = fopen("/proc/device-tree/model", "r");;
     char model_name[200];
     fgets(model_name, 200, fh); 
@@ -95,7 +49,7 @@ mraa_arm_platform()
         platform_type = MRAA_UNKNOWN_PLATFORM;
     }
         
-#endif
+
 
     /* Get compatible string from Device tree for boards that dont have enough info in /proc/cpuinfo
      */

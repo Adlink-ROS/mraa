@@ -173,7 +173,6 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 {
 	char buffer[100] = {0};
 	int i, fd;
-	//syslog(LOG_WARNING, "pwm_init: pwm%i. chip info %d.", pin, dev->chipid);
 	dev->advance_func->pwm_period_replace = pwm_period_replace;
 	dev->advance_func->pwm_read_replace = pwm_read_replace;
 	dev->advance_func->pwm_write_replace = pwm_write_replace;
@@ -187,7 +186,6 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 		}
 		if((fd = open("/sys/class/gpio/unexport", O_WRONLY)) != -1)
 		{
-			//i = sprintf(buffer,"%d",base2 + pin);
 			write(fd, buffer, i);
 			close(fd);
 		}
@@ -549,11 +547,6 @@ mraa_board_t* mraa_roscube_pico_npn1()
     {
 	    _fd = -1;
     }
-#if 0 
-    const char* pinctrl_path = "/sys/bus/platform/drivers/broxton-pinctrl";
-    int have_pinctrl = access(pinctrl_path, F_OK) != -1;
-    syslog(LOG_NOTICE, "ROSCUBE X: kernel pinctrl driver %savailable", have_pinctrl ? "" : "un");
-#endif
 
     return b;
 

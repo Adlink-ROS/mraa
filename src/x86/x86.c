@@ -39,8 +39,6 @@ mraa_x86_platform()
     int fd;
 
     if (fh != NULL) {
-        // TODO: we should find a way to check our hardware
-        #if 0
         if (getline(&line, &len, fh) != -1) {
             // Sanitize input by terminating at any of possible end of line chars
             line[strcspn(line, "\r\n")] = 0;
@@ -98,19 +96,14 @@ mraa_x86_platform()
             } else if ((strncasecmp(line, "LEC-ALAI", strlen("LEC-ALAI") + 1) == 0) ) {
                 platform_type = MRAA_ADLINK_LEC_AL;
                 plat = mraa_lec_al_board();
-	    } else if ((strncasecmp(line, "LEC-AL", strlen("LEC-AL") + 1) == 0) ) {
+	        } else if ((strncasecmp(line, "LEC-AL", strlen("LEC-AL") + 1) == 0) ) {
                 platform_type = MRAA_ADLINK_LEC_AL;
                 plat = mraa_lec_al_board();
             } else {
-                syslog(LOG_ERR, "Platform not supported, not initialising");
                 platform_type = MRAA_UNKNOWN_PLATFORM;
             }
             free(line);
         }
-        #else
-        platform_type = MRAA_ADLINK_ROSCUBE_I;
-        plat = mraa_roscube_i();
-        #endif
         fclose(fh);
     } else {
         fh = fopen("/proc/cmdline", "r");
@@ -125,7 +118,23 @@ mraa_x86_platform()
             fclose(fh);
         }
     }
-
+    if (platform_type == MRAA_UNKNOWN_PLATFORM){
+        FILE* file_hold = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
+        if (file_hold != NULL) {
+            if (getline(&line, &len, file_hold) != -1) {
+                line[strcspn(line, "\r\n")] = 0;
+                if (strncmp(line, "ROScube-I", strlen("ROScube-I") + 1) == 0 ) {
+                    platform_type = MRAA_ADLINK_ROSCUBE_I;
+                    plat = mraa_roscube_i();
+                } else {
+                    syslog(LOG_ERR, "Platform not supported, not initialising");
+                    platform_type = MRAA_UNKNOWN_PLATFORM;
+                }
+                free(line);
+            }
+            fclose(file_hold);
+        }
+    }
     if( (fd = open("/sys/devices/virtual/dmi/id/product_name", O_RDONLY)) != -1) {
 	    syslog(LOG_ERR, "Checking additional Platform support for LEC-AL iPI");
 	    if(read(fd, buffer, 10) > 0) {
